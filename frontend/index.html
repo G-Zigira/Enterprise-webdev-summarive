@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYC Taxi Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="ti ti-taxi"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">TaxiIQ</span>
+        <span class="brand-sub">NYC Analytics Platform</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Analytics</div>
+      <button class="nav-item active" data-page="overview">
+        <i class="ti ti-layout-dashboard"></i>
+        <span>Overview</span>
+      </button>
+      <button class="nav-item" data-page="trips">
+        <i class="ti ti-route"></i>
+        <span>Trip Patterns</span>
+      </button>
+      <button class="nav-item" data-page="fares">
+        <i class="ti ti-receipt-dollar"></i>
+        <span>Fare Analysis</span>
+      </button>
+      <button class="nav-item" data-page="zones">
+        <i class="ti ti-map-2"></i>
+        <span>Zone Explorer</span>
+      </button>
+
+      <div class="nav-section-label">Engineering</div>
+      <button class="nav-item" data-page="schema">
+        <i class="ti ti-database"></i>
+        <span>DB Schema</span>
+      </button>
+      <button class="nav-item" data-page="algo">
+        <i class="ti ti-binary-tree"></i>
+        <span>Algorithm</span>
+      </button>
+      <button class="nav-item" data-page="insights">
+        <i class="ti ti-bulb"></i>
+        <span>Key Insights</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">
+        <i class="ti ti-sun" id="themeIcon"></i>
+        <span id="themeLabel">Light mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────── -->
+  <div class="layout">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="ti ti-menu-2"></i>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span class="breadcrumb-root">TaxiIQ</span>
+          <i class="ti ti-chevron-right breadcrumb-sep"></i>
+          <span id="breadcrumbCurrent">Overview</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="data-badge">
+          <span class="badge-dot"></span>
+          <span>Jan 2024 · NYC TLC</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page container -->
+    <main class="main-content" id="mainContent">
+      <!-- Pages are injected here by main.js -->
+    </main>
+  </div>
+
+  <!-- ── Scripts ──────────────────────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/zones.js"></script>
+  <script src="js/algo.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
