@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="brand">NYC <b>Taxi</b> Explorer</div>
+    <nav class="tab-nav">
+        <button class="active" onclick="show('when', this)">When</button>
+        <button onclick="show('where', this)">Where</button>
+        <button onclick="show('howmuch', this)">How Much</button>
+    </nav>
+</header>
+
+<main>
+
+    <!-- WHEN -->
+    <div class="section active" id="section-when">
+        <div class="view-title">When Does the City Ride?</div>
+        <div class="view-sub">Hourly fare trends across NYC Yellow Taxi trips &middot; January 2024</div>
+
+        <div class="stat-strip">
+            <div class="stat-item">
+                <div class="stat-label">Total Trips</div>
+                <div class="stat-value" id="s-total-trips">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Peak Hour</div>
+                <div class="stat-value" id="s-peak-hour">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Quietest Hour</div>
+                <div class="stat-value" id="s-quiet-hour">&mdash;</div>
+            </div>
+        </div>
+
+        <div class="chart-block">
+            <div class="block-label">Average Fare by Hour of Day</div>
+            <canvas id="c-fare"></canvas>
+        </div>
+
+        <div class="table-block">
+            <div class="table-top">
+                <span class="table-top-label">Hourly Breakdown</span>
+                <select id="f-time" onchange="filterWhen()">
+                    <option value="all">All Times</option>
+                    <option value="morning">Morning (6am &ndash; 12pm)</option>
+                    <option value="afternoon">Afternoon (12pm &ndash; 6pm)</option>
+                    <option value="evening">Evening (6pm &ndash; 12am)</option>
+                    <option value="night">Night (12am &ndash; 6am)</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hour</th><th>Trips / Day</th><th>Avg Fare</th><th>Avg Speed</th><th>Period</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-when"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- WHERE -->
+    <div class="section" id="section-where">
+        <div class="view-title">Where Does the City Ride?</div>
+        <div class="view-sub">Borough-level trip distribution &middot; January 2024</div>
+
+        <div class="stat-strip">
+            <div class="stat-item">
+                <div class="stat-label">Top Borough</div>
+                <div class="stat-value" id="s-top-borough">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Avg Distance</div>
+                <div class="stat-value" id="s-avg-dist">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Active Zones</div>
+                <div class="stat-value" id="s-active-zones">&mdash;</div>
+            </div>
+        </div>
+
+        <div class="block">
+            <div class="block-label">Borough Trip Share</div>
+            <div class="lang-bar" id="lang-bar"></div>
+            <div class="lang-legend" id="lang-legend"></div>
+        </div>
+
+        <div class="borough-table">
+            <div class="b-row head">
+                <div>Borough</div><div>Trips</div><div>Avg Fare</div><div>Share</div>
+            </div>
+            <div id="tbody-borough"></div>
+        </div>
+
+        <div class="table-block">
+            <div class="table-top">
+                <span class="table-top-label">Top Pickup Zones</span>
+                <select id="f-borough" onchange="filterWhere()">
+                    <option value="all">All Boroughs</option>
+                    <option value="Manhattan">Manhattan</option>
+                    <option value="Brooklyn">Brooklyn</option>
+                    <option value="Queens">Queens</option>
+                    <option value="Bronx">Bronx</option>
+                    <option value="Staten Island">Staten Island</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Zone</th><th>Borough</th><th>Trips</th><th>Avg Fare</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-where"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- HOW MUCH -->
+    <div class="section" id="section-howmuch">
+        <div class="view-title">How Much Does the City Pay?</div>
+        <div class="view-sub">Fare amounts, tips, and payment methods &middot; January 2024</div>
+
+        <div class="stat-strip">
+            <div class="stat-item">
+                <div class="stat-label">Avg Fare</div>
+                <div class="stat-value" id="s-avg-fare">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Avg Tip %</div>
+                <div class="stat-value" id="s-avg-tip">&mdash;</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Credit Card</div>
+                <div class="stat-value" id="s-card-pct">&mdash;</div>
+            </div>
+        </div>
+
+        <div class="block">
+            <div class="block-label">Payment Type Breakdown</div>
+            <div id="payment-bars"></div>
+        </div>
+
+        <div class="chart-block">
+            <div class="block-label">Fare Distribution by Range</div>
+            <canvas id="c-faredist"></canvas>
+        </div>
+
+        <div class="table-block">
+            <div class="table-top">
+                <span class="table-top-label">Payment Breakdown</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Payment</th><th>Trips</th><th>Share</th><th>Avg Fare</th><th>Avg Tip %</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-howmuch"></tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
