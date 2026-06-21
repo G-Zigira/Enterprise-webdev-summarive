@@ -34,7 +34,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 app   = Flask(__name__, static_folder="../frontend", static_url_path="")
-CORS(app)
+CORS(app, origins="*")
 
 DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "nyc_taxi.db"))
 
