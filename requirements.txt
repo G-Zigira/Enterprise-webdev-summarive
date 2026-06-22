@@ -18,3 +18,4 @@ flask-cors==4.0.1
 
 # ── Dev / utilities ─────────────────────────────────────────────
 python-dotenv==1.0.1      # load .env files
+pytest==9.1.1             # unit tests (tests/)

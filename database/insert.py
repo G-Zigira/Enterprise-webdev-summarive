@@ -83,10 +83,15 @@ def apply_schema(conn: sqlite3.Connection) -> None:
 def insert_zones(conn: sqlite3.Connection, zones_path: Path = ZONES_FILE) -> None:
     """Insert zone lookup rows into the zones dimension table."""
     print(f"[insert] Loading zones from {zones_path} …")
-    df = pd.read_csv(zones_path)
+    # TLC uses literal "N/A" for unknown zones; default pandas NA parsing drops them.
+    df = pd.read_csv(zones_path, keep_default_na=False, na_values=[""])
     # Normalise column names
     df.columns = [c.strip().lower() for c in df.columns]
     df.rename(columns={"locationid": "zone_id", "zone": "zone_name"}, inplace=True, errors="ignore")
+
+    df["zone_name"]    = df["zone_name"].fillna("Unknown").replace("", "Unknown")
+    df["borough"]      = df["borough"].fillna("Unknown").replace("", "Unknown")
+    df["service_zone"] = df["service_zone"].fillna("N/A").replace("", "N/A")
 
     rows = df[["zone_id","zone_name","borough","service_zone"]].to_records(index=False).tolist()
     conn.executemany(
