@@ -33,7 +33,7 @@ from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-app   = Flask(__name__, static_folder="../frontend", static_url_path="")
+app   = Flask(__name__, static_folder="../front", static_url_path="")
 CORS(app, origins="*")
 
 DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "nyc_taxi.db"))
@@ -65,7 +65,7 @@ def query_one(sql: str, params: tuple = ()) -> dict | None:
 
 @app.route("/")
 def index():
-    return send_from_directory("../frontend", "index.html")
+    return send_from_directory("../front", "index.html")
 
 
 # ── Overview / KPI ────────────────────────────────────────────────────────────

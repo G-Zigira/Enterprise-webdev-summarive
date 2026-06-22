@@ -56,7 +56,7 @@ CREATE INDEX idx_zones_service ON zones(service_zone);
 
 
 -- ── Fact: trips ───────────────────────────────────────────────────────────────
--- One row per cleaned trip record from yellow_tripdata_2024-01.parquet.
+-- One row per cleaned trip record from yellow_tripdata_2019-01.csv.
 -- Foreign keys enforce referential integrity with dimension tables.
 CREATE TABLE trips (
     trip_id            INTEGER     PRIMARY KEY AUTOINCREMENT,   -- surrogate key

@@ -1,0 +1,29 @@
+# ── Python ──────────────────────────────────────────────────────────────
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# ── Environment ─────────────────────────────────────────────────────────
+.env
+
+# ── Generated pipeline output (regenerate with run_pipeline.py) ─────────
+data/processed/
+
+# ── Generated database (regenerate with database/insert.py) ─────────────
+nyc_taxi.db
+nyc_taxi.db-wal
+nyc_taxi.db-shm
+
+# ── Editor / OS ─────────────────────────────────────────────────────────
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ── Large raw dataset (too big for GitHub's 100MB limit) ────────────────
+# The trip CSV is ~650MB. It's hosted externally — see README "Dataset"
+# section for the download link. taxi_zone_lookup.csv and the shapefile
+# are small and stay tracked in git for convenience.
+data/raw/yellow_tripdata_2019-01.csv

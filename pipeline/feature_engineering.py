@@ -51,7 +51,10 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     -------
     df : same DataFrame with additional derived columns
     """
-    df = df.copy()
+    # NOTE: no df.copy() here — clean_trips() already returns a fresh
+    # DataFrame, and copying a 7M+ row frame again roughly doubles peak
+    # memory at the most memory-constrained point in the pipeline. We
+    # mutate in place instead.
 
     # Ensure datetime columns are parsed
     df["tpep_pickup_datetime"]  = pd.to_datetime(df["tpep_pickup_datetime"])

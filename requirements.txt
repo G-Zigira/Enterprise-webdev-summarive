@@ -1,6 +1,6 @@
 # ── Core data pipeline ─────────────────────────────────────────
 pandas==2.2.2
-pyarrow==16.1.0          # parquet file support
+pyarrow==16.1.0          # parquet read/write + streaming batch reader (database/insert.py)
 geopandas==0.14.4         # shapefile (.shp) support
 shapely==2.0.4            # geometry operations
 fiona==1.9.6              # shapefile I/O backend for geopandas

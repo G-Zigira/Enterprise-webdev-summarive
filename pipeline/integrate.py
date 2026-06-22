@@ -22,7 +22,7 @@ import geopandas as gpd
 from pathlib import Path
 
 ROOT          = Path(__file__).resolve().parent.parent
-SHAPEFILE     = ROOT / "data" / "raw" / "taxi_zones" / "taxi_zones.shp"
+SHAPEFILE     = ROOT / "data" / "raw" / "taxi_zones.shp"
 ZONE_CSV      = ROOT / "data" / "raw" / "taxi_zone_lookup.csv"
 OUTPUT_DIR    = ROOT / "data" / "processed"
 
