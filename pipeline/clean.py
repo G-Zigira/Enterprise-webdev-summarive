@@ -16,7 +16,7 @@ import numpy as np
 from pipeline.cleaning_log import CleaningLog
 
 
-# ── Constants (physical/logical bounds) ───────────────────────────────────────
+# Constants (physical/logical bounds) 
 MIN_FARE        = 2.50      # NYC TLC minimum fare
 MAX_FARE        = 500.00    # plausible upper bound
 MIN_DISTANCE    = 0.01      # miles (anything less is a meter — sensor noise)
@@ -52,21 +52,26 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     original_len = len(df)
     log.record("original_count", original_len, "Raw records loaded")
 
+<<<<<<< HEAD
+    # 1. Standardise column names
+    df = df.copy()
+=======
     # ── 1. Standardise column names ────────────────────────────────────────
     # NOTE: no df.copy() here — copying a 7M+ row frame just to rename
     # columns roughly doubles peak memory at the start of the pipeline,
     # which matters on memory-constrained machines. We rename in place;
     # callers that need the original raw frame preserved should pass
     # df.copy() themselves.
+>>>>>>> b159101893bece504c233ad3979e306199382079
     df.columns = [c.strip().lower() for c in df.columns]
 
-    # ── 2. Drop exact duplicates ───────────────────────────────────────────
+    #  2. Drop exact duplicates
     before = len(df)
     df.drop_duplicates(inplace=True)
     dropped = before - len(df)
     log.record("duplicates_removed", dropped, "Exact duplicate rows")
 
-    # ── 3. Drop rows with null critical fields ─────────────────────────────
+    # 3. Drop rows with null critical fields
     critical = [
         "tpep_pickup_datetime", "tpep_dropoff_datetime",
         "pulocationid", "dolocationid",
@@ -76,7 +81,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     df.dropna(subset=critical, inplace=True)
     log.record("nulls_critical", before - len(df), "Null in critical fields")
 
-    # ── 4. Parse & validate timestamps ────────────────────────────────────
+    # 4. Parse & validate timestamps 
     df["tpep_pickup_datetime"]  = pd.to_datetime(df["tpep_pickup_datetime"],  errors="coerce")
     df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"], errors="coerce")
 
@@ -100,7 +105,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     df = df[df["tpep_dropoff_datetime"] > df["tpep_pickup_datetime"]]
     log.record("negative_duration", before - len(df), "Dropoff before or equal to pickup")
 
-    # ── 5. Compute trip duration (seconds) for bound checks ────────────────
+    # 5. Compute trip duration (seconds) for bound checks
     df["trip_duration_sec"] = (
         df["tpep_dropoff_datetime"] - df["tpep_pickup_datetime"]
     ).dt.total_seconds().astype(int)
@@ -109,23 +114,23 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     df = df[(df["trip_duration_sec"] >= MIN_DURATION) & (df["trip_duration_sec"] <= MAX_DURATION)]
     log.record("duration_outliers", before - len(df), f"Duration outside [{MIN_DURATION}s, {MAX_DURATION}s]")
 
-    # ── 6. Fare amount bounds ──────────────────────────────────────────────
+    # 6. Fare amount bounds
     before = len(df)
     df = df[(df["fare_amount"] >= MIN_FARE) & (df["fare_amount"] <= MAX_FARE)]
     log.record("fare_outliers", before - len(df), f"Fare outside [${MIN_FARE}, ${MAX_FARE}]")
 
-    # ── 7. Trip distance bounds ────────────────────────────────────────────
+    # 7. Trip distance bounds 
     before = len(df)
     df = df[(df["trip_distance"] >= MIN_DISTANCE) & (df["trip_distance"] <= MAX_DISTANCE)]
     log.record("distance_outliers", before - len(df), f"Distance outside [{MIN_DISTANCE}, {MAX_DISTANCE}] mi")
 
-    # ── 8. Passenger count ─────────────────────────────────────────────────
+    # 8. Passenger count 
     before = len(df)
     df["passenger_count"] = df["passenger_count"].fillna(1).astype(int)
     df = df[(df["passenger_count"] >= MIN_PASSENGERS) & (df["passenger_count"] <= MAX_PASSENGERS)]
     log.record("passenger_outliers", before - len(df), f"Passengers outside [{MIN_PASSENGERS}, {MAX_PASSENGERS}]")
 
-    # ── 9. Validate categorical codes ─────────────────────────────────────
+    # 9. Validate categorical codes 
     if "payment_type" in df.columns:
         before = len(df)
         df = df[df["payment_type"].isin(VALID_PAYMENT)]
@@ -138,6 +143,9 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
         df["ratecodeid"] = df["ratecodeid"].astype(int)
         log.record("invalid_rate_code", before - len(df), "Unknown ratecodeid codes")
 
+<<<<<<< HEAD
+    # 10. Fill remaining non-critical nulls
+=======
     # ── 9b. Cast remaining ID/categorical columns to native ints ──────────
     # These arrive as float64 from data_loader.py (to tolerate nulls before
     # cleaning); by this point all nulls have been dropped/filtered, so it's
@@ -152,6 +160,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
         df["dolocationid"] = df["dolocationid"].astype(int)
 
     # ── 10. Fill remaining non-critical nulls ──────────────────────────────
+>>>>>>> b159101893bece504c233ad3979e306199382079
     if "tip_amount"   in df.columns: df["tip_amount"]   = df["tip_amount"].fillna(0.0)
     if "tolls_amount" in df.columns: df["tolls_amount"] = df["tolls_amount"].fillna(0.0)
     if "mta_tax"      in df.columns: df["mta_tax"]      = df["mta_tax"].fillna(0.5)
@@ -160,7 +169,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     if "congestion_surcharge" in df.columns:
         df["congestion_surcharge"] = df["congestion_surcharge"].fillna(0.0)
 
-    # ── 11. Reset index ────────────────────────────────────────────────────
+    # 11. Reset index 
     df.reset_index(drop=True, inplace=True)
 
     retained = len(df)

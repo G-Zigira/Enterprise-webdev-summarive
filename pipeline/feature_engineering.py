@@ -60,7 +60,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df["tpep_pickup_datetime"]  = pd.to_datetime(df["tpep_pickup_datetime"])
     df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"])
 
-    # ── Feature 1: Trip duration (seconds) ────────────────────────────────
+    # Feature 1: Trip duration (seconds) 
     # Justification: base metric for all time-based analysis.
     # Already computed in clean.py if present; recompute for safety.
     if "trip_duration_sec" not in df.columns:
@@ -68,7 +68,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
             df["tpep_dropoff_datetime"] - df["tpep_pickup_datetime"]
         ).dt.total_seconds().astype(int)
 
-    # ── Feature 2: Average speed (mph) ────────────────────────────────────
+    # Feature 2: Average speed (mph) 
     # Justification: speed correlates with traffic congestion and time of day.
     # speed = distance / time. Guard against zero division.
     df["speed_mph"] = (
@@ -78,14 +78,14 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     # Clamp physically impossible speeds (sensor errors)
     df["speed_mph"] = df["speed_mph"].clip(upper=80)
 
-    # ── Feature 3: Tip percentage ─────────────────────────────────────────
+    # Feature 3: Tip percentage 
     # Justification: normalised tip reveals tipping behaviour independent of fare.
     # Cash tips are not recorded by TLC — result is 0.0 for cash trips.
     df["tip_pct"] = (
         df["tip_amount"] / df["fare_amount"].replace(0, np.nan) * 100
     ).fillna(0).round(2)
 
-    # ── Feature 4: Rush-hour flag ─────────────────────────────────────────
+    # Feature 4: Rush-hour flag 
     # Justification: demand modelling; rush-hour trips often have higher fares.
     pickup_hour = df["tpep_pickup_datetime"].dt.hour
     pickup_dow  = df["tpep_pickup_datetime"].dt.dayofweek   # 0=Mon, 6=Sun
@@ -96,24 +96,24 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
 
     df["is_rush_hour"] = (is_weekday & (is_am_rush | is_pm_rush)).astype(int)
 
-    # ── Feature 5: Time-of-day bucket ─────────────────────────────────────
+    # Feature 5: Time-of-day bucket 
     # Justification: coarser temporal grouping for dashboard filtering.
     df["time_of_day"] = pickup_hour.apply(_bucket_time)
 
-    # ── Feature 6: Fare per mile ──────────────────────────────────────────
+    # Feature 6: Fare per mile 
     # Justification: price efficiency metric; highlights route pricing anomalies.
     df["fare_per_mile"] = (
         df["fare_amount"] / df["trip_distance"].replace(0, np.nan)
     ).replace([np.inf, -np.inf], np.nan).round(2)
 
-    # ── Feature 7: Airport trip flag ──────────────────────────────────────
+    # Feature 7: Airport trip flag 
     # Justification: airport segment is revenue-critical; avg fare ~2.4× city avg.
     df["is_airport_trip"] = (
         df["pulocationid"].isin(AIRPORT_ZONE_IDS) |
         df["dolocationid"].isin(AIRPORT_ZONE_IDS)
     ).astype(int)
 
-    # ── Convenience datetime columns for database inserts ─────────────────
+    # Convenience datetime columns for database inserts 
     df["pickup_date"] = df["tpep_pickup_datetime"].dt.date
     df["pickup_hour"] = pickup_hour
     df["pickup_dow"]  = pickup_dow

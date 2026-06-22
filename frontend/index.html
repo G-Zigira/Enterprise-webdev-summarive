@@ -9,12 +9,57 @@
 </head>
 <body>
 
+<<<<<<< HEAD
+  <!-- ── Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="ti ti-taxi"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">TaxiIQ</span>
+        <span class="brand-sub">NYC Analytics Platform</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Analytics</div>
+      <button class="nav-item active" data-page="overview">
+        <i class="ti ti-layout-dashboard"></i>
+        <span>Overview</span>
+      </button>
+      <button class="nav-item" data-page="trips">
+        <i class="ti ti-route"></i>
+        <span>Trip Patterns</span>
+      </button>
+      <button class="nav-item" data-page="fares">
+        <i class="ti ti-receipt-dollar"></i>
+        <span>Fare Analysis</span>
+      </button>
+      <button class="nav-item" data-page="zones">
+        <i class="ti ti-map-2"></i>
+        <span>Zone Explorer</span>
+      </button>
+
+      <div class="nav-section-label">Engineering</div>
+      <button class="nav-item" data-page="schema">
+        <i class="ti ti-database"></i>
+        <span>DB Schema</span>
+      </button>
+      <button class="nav-item" data-page="algo">
+        <i class="ti ti-binary-tree"></i>
+        <span>Algorithm</span>
+      </button>
+      <button class="nav-item" data-page="insights">
+        <i class="ti ti-bulb"></i>
+        <span>Key Insights</span>
+      </button>
+=======
 <header>
     <div class="brand">NYC <b>Taxi</b> Explorer</div>
     <nav class="tab-nav">
         <button class="active" onclick="show('when', this)">When</button>
         <button onclick="show('where', this)">Where</button>
         <button onclick="show('howmuch', this)">How Much</button>
+>>>>>>> b159101893bece504c233ad3979e306199382079
     </nav>
 </header>
 
@@ -67,6 +112,20 @@
         </div>
     </div>
 
+<<<<<<< HEAD
+  <!-- Main  -->
+  <div class="layout">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="ti ti-menu-2"></i>
+        </button>
+        <div class="topbar-breadcrumb">
+          <span class="breadcrumb-root">TaxiIQ</span>
+          <i class="ti ti-chevron-right breadcrumb-sep"></i>
+          <span id="breadcrumbCurrent">Overview</span>
+=======
     <!-- WHERE -->
     <div class="section" id="section-where">
         <div class="view-title">Where Does the City Ride?</div>
@@ -85,6 +144,7 @@
                 <div class="stat-label">Active Zones</div>
                 <div class="stat-value" id="s-active-zones">&mdash;</div>
             </div>
+>>>>>>> b159101893bece504c233ad3979e306199382079
         </div>
 
         <div class="block">
@@ -100,6 +160,15 @@
             <div id="tbody-borough"></div>
         </div>
 
+<<<<<<< HEAD
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/zones.js"></script>
+  <script src="js/algo.js"></script>
+  <script src="js/main.js"></script>
+=======
         <div class="table-block">
             <div class="table-top">
                 <span class="table-top-label">Top Pickup Zones</span>
@@ -171,5 +240,6 @@
 </main>
 
 <script src="app.js"></script>
+>>>>>>> b159101893bece504c233ad3979e306199382079
 </body>
 </html>

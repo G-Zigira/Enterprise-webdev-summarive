@@ -39,11 +39,11 @@ CORS(app, origins="*")
 DB_PATH = os.getenv("DB_PATH", str(Path(__file__).parent.parent / "nyc_taxi.db"))
 
 
-# ── DB connection helper ──────────────────────────────────────────────────────
+#  DB connection helper
 
 def get_db() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row          # rows behave like dicts
+    conn.row_factory = sqlite3.Row          # The rows behave like dictionaries
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
@@ -61,14 +61,14 @@ def query_one(sql: str, params: tuple = ()) -> dict | None:
     return rows[0] if rows else None
 
 
-# ── Serve frontend ────────────────────────────────────────────────────────────
+#  frontend 
 
 @app.route("/")
 def index():
     return send_from_directory("../front", "index.html")
 
 
-# ── Overview / KPI ────────────────────────────────────────────────────────────
+# Overview / KPI 
 
 @app.route("/api/kpis")
 def kpis():
@@ -112,7 +112,7 @@ def hourly_volume():
     return jsonify(rows)
 
 
-# ── Borough & Zone ────────────────────────────────────────────────────────────
+# Borough & Zone 
 
 @app.route("/api/borough-summary")
 def borough_summary():
@@ -159,7 +159,7 @@ def zone_service_summary():
     return jsonify(rows)
 
 
-# ── Fare Analysis ─────────────────────────────────────────────────────────────
+# Fare Analysis
 
 @app.route("/api/payment-breakdown")
 def payment_breakdown():
@@ -208,7 +208,7 @@ def fare_by_hour():
     return jsonify(rows)
 
 
-# ── Trip Patterns ─────────────────────────────────────────────────────────────
+# Trip Patterns 
 
 @app.route("/api/distance-distribution")
 def distance_distribution():
@@ -252,7 +252,7 @@ def rush_hour_comparison():
     return jsonify(rows)
 
 
-# ── Zone Explorer (paginated) ─────────────────────────────────────────────────
+# Zone Explorer (paginated) 
 
 @app.route("/api/zones")
 def zones():
@@ -286,7 +286,7 @@ def zones():
     return jsonify({"data": rows, "total": total["n"] if total else 0, "page": page, "per_page": per_page})
 
 
-# ── Insight endpoints ─────────────────────────────────────────────────────────
+# The insight endpoints 
 
 @app.route("/api/insight/airport")
 def insight_airport():
@@ -326,7 +326,7 @@ def insight_tips():
     return jsonify(rows)
 
 
-# ── Health check ──────────────────────────────────────────────────────────────
+#Health check 
 
 @app.route("/api/health")
 def health():
@@ -337,8 +337,7 @@ def health():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# ── Run ───────────────────────────────────────────────────────────────────────
-
+# Run 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_ENV", "development") == "development"

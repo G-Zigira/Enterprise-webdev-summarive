@@ -1,16 +1,4 @@
-"""
-cleaning_log.py
-===============
-Task 1 – Data Processing & Cleaning
-Tracks all exclusion reasons and counts for the technical report.
 
-Usage:
-    from pipeline.cleaning_log import CleaningLog
-    log = CleaningLog()
-    log.record("duplicates_removed", 1234, "Exact duplicate rows")
-    log.print_summary()
-    log.to_csv("data/cleaning_log.csv")
-"""
 
 import csv
 import json
@@ -19,15 +7,7 @@ from pathlib import Path
 
 
 class CleaningLog:
-    """
-    Immutable append-only log of data cleaning decisions.
 
-    Each entry records:
-        step        — short machine-readable key
-        count       — number of records affected
-        description — human-readable explanation
-        timestamp   — ISO 8601 wall-clock time
-    """
 
     def __init__(self):
         self._entries: list[dict] = []

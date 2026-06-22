@@ -1,85 +1,20 @@
-"""
-data_loader.py
-==============
-Task 1 – Data Processing & Cleaning
-Step 1: Load raw source files (CSV trip data, zone lookup CSV, shapefile)
-        from the data/raw/ folder.
-"""
 
+
+import os
 import pandas as pd
 from pathlib import Path
 from typing import List, Optional
 
-# ── Paths ──────────────────────────────────────────────────────────────────
-ROOT = Path(__file__).resolve().parent.parent
+# Path
+ROOT          = Path(__file__).resolve().parent.parent / "data"
+PARQUET_PATH  = ROOT / "yellow_tripdata_2024-01.parquet"
+ZONE_CSV_PATH = ROOT / "taxi_zone_lookup.csv"
+SHAPEFILE_PATH = ROOT / "taxi_zones" / "taxi_zones.shp"
 
-# Search paths for trip CSV files
-TRIP_CSV_SEARCH = [
-    ROOT / "data" / "raw" / "yellow_tripdata_2019-01.csv",
-    ROOT / "data" / "yellow_tripdata_2019-01.csv",
-    ROOT / "yellow_tripdata_2019-01.csv",
-    ROOT / "data" / "raw" / "yellow_tripdata_2024-01.csv",
-    ROOT / "data" / "yellow_tripdata_2024-01.csv",
-    ROOT / "yellow_tripdata_2024-01.csv",
-]
 
-ZONE_CSV_SEARCH = [
-    ROOT / "data" / "raw" / "taxi_zone_lookup.csv",
-    ROOT / "data" / "taxi_zone_lookup.csv",
-    ROOT / "taxi_zone_lookup.csv",
-]
-
-SHAPEFILE_SEARCH = [
-    ROOT / "data" / "raw" / "taxi_zones.shp",
-    ROOT / "data" / "raw" / "taxi_zones" / "taxi_zones.shp",
-    ROOT / "data" / "taxi_zones.shp",
-    ROOT / "taxi_zones.shp",
-]
-
-# Columns we actually need from the trip CSV
-# Note: Airport_fee was added in later years (2021+), so it's optional
-TRIP_USECOLS = [
-    "VendorID", "tpep_pickup_datetime", "tpep_dropoff_datetime",
-    "passenger_count", "trip_distance", "RatecodeID", "store_and_fwd_flag",
-    "PULocationID", "DOLocationID", "payment_type",
-    "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount",
-    "improvement_surcharge", "total_amount", "congestion_surcharge"
-]
-
-# Data types for faster loading and memory efficiency
-TRIP_DTYPES = {
-    "VendorID": "Int64",
-    "passenger_count": "Int64",
-    "trip_distance": "float32",
-    "RatecodeID": "Int64",
-    "store_and_fwd_flag": "category",
-    "PULocationID": "Int64",
-    "DOLocationID": "Int64",
-    "payment_type": "Int64",
-    "fare_amount": "float32",
-    "extra": "float32",
-    "mta_tax": "float32",
-    "tip_amount": "float32",
-    "tolls_amount": "float32",
-    "improvement_surcharge": "float32",
-    "total_amount": "float32",
-    "congestion_surcharge": "float32"
-}
-
-def _find_file(search_paths: List[Path], description: str) -> Path:
-    """Find the first existing file in a list of search paths."""
-    for path in search_paths:
-        if path.exists():
-            print(f"[data_loader] Found {description} at: {path}")
-            return path
-    raise FileNotFoundError(
-        f"[data_loader] Could not find {description} in any of these locations:\n"
-        + "\n".join(f"  {p}" for p in search_paths)
-    )
-
-def load_trips() -> pd.DataFrame:
+def load_trips(path: Path = PARQUET_PATH) -> pd.DataFrame:
     """
-    Load the yellow taxi trip CSV.
+    Load the yellow taxi trip parquet file.
     Returns raw DataFrame — no cleaning applied here.
     """
     path = _find_file(TRIP_CSV_SEARCH, "yellow_tripdata CSV")
