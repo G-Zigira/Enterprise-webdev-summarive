@@ -33,15 +33,8 @@ nyc-taxi-dashboard/
 │
 ├── frontend/                   # Task 3 (Frontend) — Dashboard UI
 │   ├── index.html              # Single-page shell
-│   ├── css/
-│   │   ├── theme.css           # Light / dark CSS variables
-│   │   └── style.css           # Full component + layout system
-│   └── js/
-│       ├── data.js             # Simulated data layer (mirrors API)
-│       ├── charts.js           # Chart.js wrapper utilities
-│       ├── zones.js            # Zone explorer (filter + paginate)
-│       ├── algo.js             # Manual max-heap algorithm (live demo)
-│       └── main.js             # Page router + all page HTML builders
+│   ├── style.css               
+│   └── app.js
 │
 ├── data/
 │   ├── raw/                    # Place downloaded source files here
