@@ -1,8 +1,8 @@
 # ── Core data pipeline ─────────────────────────────────────────
-=======
+
 pandas==2.2.3
 pyarrow==18.1.0          # parquet file support
->>>>>>> Stashed changes
+
 geopandas==0.14.4         # shapefile (.shp) support
 shapely==2.0.7            # geometry operations
 fiona==1.10.1              # shapefile I/O backend for geopandas
