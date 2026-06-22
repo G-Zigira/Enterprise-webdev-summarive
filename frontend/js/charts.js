@@ -2,7 +2,7 @@
 
 const CHARTS = (() => {
 
-  // Chart registry — destroy before re-render 
+  // Chart registry 
   const registry = {};
 
   function destroy(id) {
@@ -133,9 +133,9 @@ const CHARTS = (() => {
     }], deepMerge({ cutout: '65%', plugins: { legend: { display: false } } }, opts));
   }
 
-  // Daily trip line (overview)
+  // Daily trip line (
     const rows  = DATA.dailyTrips();
-    const labels = rows.map(r => r.pickup_date.slice(5));   // MM-DD
+    const labels = rows.map(r => r.pickup_date.slice(5));   
     const values = rows.map(r => r.trips);
     const c = getCSSVar('--c1');
     return line(canvasId, labels, values, c, {
@@ -225,7 +225,7 @@ const CHARTS = (() => {
     });
   }
 
-  //  Insight 1: avg fare by service zone
+  // 1: avg fare by service zone
   function renderInsight1(canvasId) {
     const rows = DATA.insightAirport();
     const colors = getColors();
@@ -235,7 +235,7 @@ const CHARTS = (() => {
     });
   }
 
-  // Insight 2: speed + fare/min dual axis 
+  //  2: speed + fare/min dual axis 
   function renderInsight2(canvasId) {
     const rows = DATA.insightNight();
     const labels = rows.map(r => r.hour+':00');
@@ -254,7 +254,7 @@ const CHARTS = (() => {
     });
   }
 
-  //Insight 3: tip rate by payment
+  // 3: tip rate by payment
   function renderInsight3(canvasId) {
     const rows = DATA.insightTips();
     const colors = [getCSSVar('--c1'), getCSSVar('--text-tertiary'), getCSSVar('--c2'), getCSSVar('--c4')];

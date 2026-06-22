@@ -1,8 +1,8 @@
 
 const ALGO = (() => {
 
-  // Manual max-heap (array-backed)
-  // Each element: [count, zone_id, zone_name, borough]
+  // Manual max-heap 
+  
 
   function siftDown(heap, i, n) {
     while (true) {
@@ -12,7 +12,7 @@ const ALGO = (() => {
       if (l < n && heap[l][0] > heap[largest][0]) largest = l;
       if (r < n && heap[r][0] > heap[largest][0]) largest = r;
       if (largest === i) break;
-      // Manual swap — no destructuring to keep it explicit
+  
       const tmp = heap[i];
       heap[i] = heap[largest];
       heap[largest] = tmp;
@@ -21,7 +21,7 @@ const ALGO = (() => {
   }
 
   function heapify(arr) {
-    // Build max-heap in O(n) — start from last internal node
+    // Build max-heap in 
     for (let i = Math.floor(arr.length / 2) - 1; i >= 0; i--) {
       siftDown(arr, i, arr.length);
     }
@@ -42,10 +42,10 @@ const ALGO = (() => {
    */
   function topKZones(k) {
     // Step 1: Build frequency array from DATA (simulates scanning trip records)
-    const zones = DATA.topZones(999); // get all zones
+    const zones = DATA.topZones(999); 
     const heap  = zones.map(z => [z.total_trips, z.zone_id, z.zone_name, z.borough]);
 
-    // Step 2: Heapify — O(n)
+    // Step 2: Heapify 
     heapify(heap);
 
     // Step 3: Extract top-k — O(k log n)

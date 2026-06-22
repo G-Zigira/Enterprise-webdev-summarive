@@ -117,7 +117,7 @@
     CHARTS.renderHourlyBar('hourlyChart');
   }
 
-  //TRIPS
+  //Trips
   function buildTrips() {
     const top = DATA.topZones(10);
     const maxTrips = top[0]?.total_trips || 1;
@@ -214,7 +214,7 @@
     }
   }
 
-  // FARES
+  // Fare
   function buildFares() {
     const k = DATA.kpis();
     const pay = DATA.paymentBreakdown();
@@ -275,7 +275,7 @@
     CHARTS.renderFareHour('fareHourChart');
   }
 
-  //ZONES
+  //Zone
   function buildZones() {
     return `
       <div class="page-header">
@@ -333,7 +333,7 @@
 
   function initZones() { ZONES_MODULE.init(); }
 
-  //SCHEMA
+  //Schema
   function buildSchema() {
     return `
       <div class="page-header">
@@ -453,7 +453,7 @@
     return `<div class="schema-box"><div class="schema-box-header">${title}</div>${rowsHtml}</div>`;
   }
 
-  // ALGORITHM 
+  // algo
   function buildAlgo() {
     return `
       <div class="page-header">

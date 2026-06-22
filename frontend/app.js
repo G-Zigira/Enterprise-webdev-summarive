@@ -17,7 +17,7 @@ const tickColor = '#6e7681';
 let fareChart, fareDistChart;
 let _whenData = [];
 
-/* ── Navigation ── */
+/*Navigation */
 function show(name, btn) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active'));
@@ -27,7 +27,7 @@ function show(name, btn) {
     fareDistChart.resize();
 }
 
-/* ── API helper ── */
+/* API helper*/
 async function get(path) {
     const res = await fetch(API + path);
     if (!res.ok) throw new Error(res.status);
@@ -41,7 +41,7 @@ function hourPeriod(h) {
     return 'night';
 }
 
-/* ── WHEN ── */
+/*When*/
 async function loadWhen() {
     try {
         const kpis = await get('/api/kpis');
@@ -91,7 +91,7 @@ function filterWhen() {
     renderWhenTable(data.length ? data : _whenData);
 }
 
-/* ── WHERE ── */
+/* Where */
 async function loadWhere() {
     try {
         const kpis = await get('/api/kpis');
@@ -154,7 +154,7 @@ function filterWhere() {
     loadZonesTable(b === 'all' ? '' : b);
 }
 
-/* ── HOW MUCH ── */
+/* hoow much  */
 async function loadHowMuch() {
     try {
         const payments = await get('/api/payment-breakdown');
@@ -194,7 +194,7 @@ async function loadHowMuch() {
     }
 }
 
-/* ── Charts (start empty — all data comes from API) ── */
+/*Charts where data comes from API*/
 fareChart = new Chart(document.getElementById('c-fare'), {
     type: 'line',
     data: {
@@ -235,7 +235,7 @@ fareDistChart = new Chart(document.getElementById('c-faredist'), {
     }
 });
 
-/* ── Init ── */
+/* Init*/
 loadWhen();
 loadWhere();
 loadHowMuch();

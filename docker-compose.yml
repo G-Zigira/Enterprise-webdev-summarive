@@ -12,18 +12,3 @@ services:
       - ./nyc_taxi.db:/app/nyc_taxi.db
       - ./data:/app/data
     restart: unless-stopped
-    
-  # Optional: PostgreSQL version
-  # postgres:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_DB: nyc_taxi
-  #     POSTGRES_USER: taxi_user
-  #     POSTGRES_PASSWORD: taxi_pass
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
-
-# volumes:
-#   postgres_data:
