@@ -20,7 +20,7 @@ Covers three layers: **data pipeline**, **relational database**, and **interacti
 
 ## Video Walkthrough
 
-> 📹 [Link to video walkthrough — insert your URL here]
+> https://youtu.be/61wvH-W_YH8 (Youtbe Link)
 
 ---
 
