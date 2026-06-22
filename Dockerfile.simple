@@ -1,0 +1,27 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# Install only essential system dependencies (no geopandas/geos)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies (skip geopandas if it causes issues)
+RUN pip install --no-cache-dir -r requirements.txt || \
+    pip install --no-cache-dir pandas==2.2.3 pyarrow==18.1.0 \
+    numpy==2.1.0 sqlalchemy==2.0.41 flask==3.0.3 flask-cors==4.0.1 \
+    python-dotenv==1.0.1
+
+# Copy the entire project
+COPY . .
+
+# Expose the Flask port
+EXPOSE 5001
+
+# Run the Flask app
+CMD ["python", "backend/app.py"]

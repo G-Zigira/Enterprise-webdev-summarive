@@ -27,8 +27,9 @@ MIN_PASSENGERS  = 1
 MAX_PASSENGERS  = 6         # NYC TLC max occupancy
 VALID_PAYMENT   = {1, 2, 3, 4, 5, 6}
 VALID_RATE_CODE = {1, 2, 3, 4, 5, 6}
-DATE_START      = "2024-01-01"
-DATE_END        = "2024-01-31 23:59:59"
+# NOTE: the source file is yellow_tripdata_2019-01.csv (January 2019).
+DATE_START      = "2019-01-01"
+DATE_END        = "2019-01-31 23:59:59"
 
 
 def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.DataFrame, CleaningLog]:
@@ -51,8 +52,17 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     original_len = len(df)
     log.record("original_count", original_len, "Raw records loaded")
 
+<<<<<<< HEAD
     # 1. Standardise column names
     df = df.copy()
+=======
+    # ── 1. Standardise column names ────────────────────────────────────────
+    # NOTE: no df.copy() here — copying a 7M+ row frame just to rename
+    # columns roughly doubles peak memory at the start of the pipeline,
+    # which matters on memory-constrained machines. We rename in place;
+    # callers that need the original raw frame preserved should pass
+    # df.copy() themselves.
+>>>>>>> b159101893bece504c233ad3979e306199382079
     df.columns = [c.strip().lower() for c in df.columns]
 
     #  2. Drop exact duplicates
@@ -88,7 +98,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     )
     before = len(df)
     df = df[mask_date]
-    log.record("out_of_range_dates", before - len(df), "Trips outside Jan 2024 window")
+    log.record("out_of_range_dates", before - len(df), "Trips outside Jan 2019 window")
 
     # Dropoff must be after pickup
     before = len(df)
@@ -124,19 +134,40 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     if "payment_type" in df.columns:
         before = len(df)
         df = df[df["payment_type"].isin(VALID_PAYMENT)]
+        df["payment_type"] = df["payment_type"].astype(int)
         log.record("invalid_payment_type", before - len(df), "Unknown payment_type codes")
 
     if "ratecodeid" in df.columns:
         before = len(df)
         df = df[df["ratecodeid"].isin(VALID_RATE_CODE)]
+        df["ratecodeid"] = df["ratecodeid"].astype(int)
         log.record("invalid_rate_code", before - len(df), "Unknown ratecodeid codes")
 
+<<<<<<< HEAD
     # 10. Fill remaining non-critical nulls
+=======
+    # ── 9b. Cast remaining ID/categorical columns to native ints ──────────
+    # These arrive as float64 from data_loader.py (to tolerate nulls before
+    # cleaning); by this point all nulls have been dropped/filtered, so it's
+    # safe to cast to plain Python-compatible int dtypes. This matters for
+    # SQLite CHECK constraints at insert time, which can misbehave with
+    # pandas nullable/extension dtypes.
+    if "vendorid" in df.columns:
+        df["vendorid"] = df["vendorid"].astype(int)
+    if "pulocationid" in df.columns:
+        df["pulocationid"] = df["pulocationid"].astype(int)
+    if "dolocationid" in df.columns:
+        df["dolocationid"] = df["dolocationid"].astype(int)
+
+    # ── 10. Fill remaining non-critical nulls ──────────────────────────────
+>>>>>>> b159101893bece504c233ad3979e306199382079
     if "tip_amount"   in df.columns: df["tip_amount"]   = df["tip_amount"].fillna(0.0)
     if "tolls_amount" in df.columns: df["tolls_amount"] = df["tolls_amount"].fillna(0.0)
     if "mta_tax"      in df.columns: df["mta_tax"]      = df["mta_tax"].fillna(0.5)
     if "improvement_surcharge" in df.columns:
         df["improvement_surcharge"] = df["improvement_surcharge"].fillna(0.3)
+    if "congestion_surcharge" in df.columns:
+        df["congestion_surcharge"] = df["congestion_surcharge"].fillna(0.0)
 
     # 11. Reset index 
     df.reset_index(drop=True, inplace=True)

@@ -1,10 +1,10 @@
 
 from pathlib import Path
-from pipeline.data_loader        import load_all
-from pipeline.clean              import clean_trips
-from pipeline.feature_engineering import add_features
+import gc
 
-OUTPUT_DIR = Path("data/processed")
+# Output directory — always relative to this file, not the working directory
+ROOT       = Path(__file__).resolve().parent
+OUTPUT_DIR = ROOT / "data" / "processed"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -24,25 +24,33 @@ def run():
 
     # Step 3: Feature engineering 
     enriched = add_features(cleaned)
+    del cleaned
+    gc.collect()
 
     # Step 4: Join zone names
     # Pickup zone
-    enriched = enriched.merge(
-        zones.rename(columns={"zone_id":"pulocationid",
-                               "zone_name":"pu_zone","borough":"pu_borough",
-                               "service_zone":"pu_service_zone"}),
-        on="pulocationid", how="left"
-    )
-    # Dropoff zone
-    enriched = enriched.merge(
-        zones.rename(columns={"zone_id":"dolocationid",
-                               "zone_name":"do_zone","borough":"do_borough",
-                               "service_zone":"do_service_zone"}),
-        on="dolocationid", how="left"
-    )
+    pu_zones = zones.rename(columns={
+        "zone_id":      "pulocationid",
+        "zone_name":    "pu_zone",
+        "borough":      "pu_borough",
+        "service_zone": "pu_service_zone",
+    })
+    merged_pu = enriched.merge(pu_zones, on="pulocationid", how="left")
+    del enriched, pu_zones
+    gc.collect()
 
-    print(f"\n[pipeline] Final enriched shape: {enriched.shape}")
-    print(f"[pipeline] Columns: {list(enriched.columns)}")
+    # Dropoff zone
+    do_zones = zones.rename(columns={
+        "zone_id":      "dolocationid",
+        "zone_name":    "do_zone",
+        "borough":      "do_borough",
+        "service_zone": "do_service_zone",
+    })
+    enriched = merged_pu.merge(do_zones, on="dolocationid", how="left")
+    del merged_pu, do_zones
+    gc.collect()
+
+    print(f"\n[pipeline] Enriched shape : {enriched.shape}")
 
     # Step 5: Export 
     out_path = OUTPUT_DIR / "trips_cleaned.parquet"
@@ -55,7 +63,9 @@ def run():
 
     print("\n" + "=" * 60)
     print("  PIPELINE COMPLETE")
+    print(f"  Output folder: {OUTPUT_DIR}")
     print("=" * 60)
+    print("\nNext step: run  python database/insert.py")
     return enriched, zones
 
 

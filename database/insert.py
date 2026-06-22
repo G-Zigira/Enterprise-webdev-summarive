@@ -2,20 +2,17 @@
 insert.py
 =========
 Task 2 – Database Design & Implementation
-Inserts cleaned, enriched trip data and zone dimension data into the database.
+Inserts cleaned trip + zone data into SQLite (default) or PostgreSQL.
 
-Supports both SQLite (default, zero setup) and PostgreSQL.
+Run AFTER run_pipeline.py has completed.
 
 Usage:
-    # SQLite (default — for development)
-    python database/insert.py
+    python database/insert.py        (Windows CMD / PowerShell)
+    python3 database/insert.py       (macOS / Linux)
 
-    # PostgreSQL
-    DB_URL=postgresql://user:pass@localhost/nyc_taxi python database/insert.py
-
-Environment variables:
-    DB_URL     — SQLAlchemy connection string (defaults to SQLite)
-    BATCH_SIZE — rows per INSERT batch (default: 10,000)
+Environment variables (optional — set in .env):
+    DB_URL     — connection string (default: sqlite:///nyc_taxi.db in project root)
+    BATCH_SIZE — rows per INSERT batch (default: 10000)
 """
 
 import os
@@ -36,25 +33,25 @@ ZONES_FILE  = DATA_DIR / "zones_clean.csv"
 
 # Columns in trips parquet are renamed to match DB schematics
 COLUMN_MAP = {
-    "tpep_pickup_datetime":    "pickup_datetime",
-    "tpep_dropoff_datetime":   "dropoff_datetime",
-    "pulocationid":            "pu_zone_id",
-    "dolocationid":            "do_zone_id",
-    "ratecodeid":              "rate_code_id",
-    "store_and_fwd_flag":      "store_fwd_flag",
+    "tpep_pickup_datetime":  "pickup_datetime",
+    "tpep_dropoff_datetime": "dropoff_datetime",
+    "pulocationid":          "pu_zone_id",
+    "dolocationid":          "do_zone_id",
+    "ratecodeid":            "rate_code_id",
+    "store_and_fwd_flag":    "store_fwd_flag",
 }
 
 # Columns to write to the trips table and they must match schema.sql
 TRIP_COLS = [
-    "pickup_datetime","dropoff_datetime",
-    "pu_zone_id","do_zone_id","rate_code_id",
-    "passenger_count","trip_distance","store_fwd_flag",
-    "fare_amount","extra","mta_tax","tip_amount","tolls_amount",
-    "improvement_surcharge","total_amount","congestion_surcharge","airport_fee",
+    "pickup_datetime", "dropoff_datetime",
+    "pu_zone_id", "do_zone_id", "rate_code_id",
+    "passenger_count", "trip_distance", "store_fwd_flag",
+    "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount",
+    "improvement_surcharge", "total_amount", "congestion_surcharge", "airport_fee",
     "payment_type",
-    "trip_duration_sec","speed_mph","tip_pct",
-    "is_rush_hour","time_of_day","fare_per_mile","is_airport_trip",
-    "pickup_hour","pickup_dow","pickup_date",
+    "trip_duration_sec", "speed_mph", "tip_pct",
+    "is_rush_hour", "time_of_day", "fare_per_mile", "is_airport_trip",
+    "pickup_hour", "pickup_dow", "pickup_date",
 ]
 
 
@@ -64,7 +61,7 @@ def get_sqlite_conn(path: str = "nyc_taxi.db") -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     conn.execute("PRAGMA journal_mode=WAL")   #  writes faster
     conn.execute("PRAGMA synchronous=NORMAL")
-    conn.execute("PRAGMA cache_size=-64000")  # 64 MB cache
+    conn.execute("PRAGMA cache_size=-64000")
     conn.execute("PRAGMA foreign_keys=ON")
     return conn
 
@@ -87,11 +84,15 @@ def insert_zones(conn: sqlite3.Connection, zones_path: Path = ZONES_FILE) -> Non
     df = pd.read_csv(zones_path)
     # Normalises the column names
     df.columns = [c.strip().lower() for c in df.columns]
-    df.rename(columns={"locationid":"zone_id","zone":"zone_name"}, inplace=True, errors="ignore")
+    df.rename(columns={"locationid": "zone_id", "zone": "zone_name"}, inplace=True, errors="ignore")
+
+    df["zone_name"]    = df["zone_name"].fillna("Unknown").replace("", "Unknown")
+    df["borough"]      = df["borough"].fillna("Unknown").replace("", "Unknown")
+    df["service_zone"] = df["service_zone"].fillna("N/A").replace("", "N/A")
 
     rows = df[["zone_id","zone_name","borough","service_zone"]].to_records(index=False).tolist()
     conn.executemany(
-        "INSERT OR IGNORE INTO zones(zone_id,zone_name,borough,service_zone) VALUES (?,?,?,?)",
+        "INSERT OR IGNORE INTO zones(zone_id, zone_name, borough, service_zone) VALUES (?,?,?,?)",
         rows
     )
     conn.commit()
@@ -143,19 +144,22 @@ def insert_trips(conn: sqlite3.Connection, trips_path: Path = TRIPS_FILE) -> Non
         conn.executemany(sql, rows)
         conn.commit()
         inserted += len(rows)
-        pct = inserted / total * 100
-        elapsed = time.time() - t_start
-        rate = inserted / elapsed if elapsed > 0 else 0
-        print(f"  … {inserted:,} / {total:,} ({pct:.0f}%)  {rate:,.0f} rows/s", end="\r")
 
-    print(f"\n[insert] Done. {inserted:,} trip rows inserted in {elapsed:.1f}s.")
+        elapsed = time.time() - t0
+        rate    = inserted / elapsed if elapsed > 0 else 0
+        pct     = inserted / total * 100
+        print(f"  {inserted:,} / {total:,} ({pct:.0f}%)  —  {rate:,.0f} rows/s", end="\r")
+
+        # Free this batch before pulling the next one
+        del chunk, records, rows
+
+    print(f"\n[insert] Done — {inserted:,} trips inserted in {time.time()-t0:.1f}s.")
 
 
 #  Verification
 
 def verify(conn: sqlite3.Connection) -> None:
-    """Print row counts for each table to confirm successful load."""
-    print("\n── Verification ─────────────────────────────────")
+    print("\n── Verification ──────────────────────────────────")
     for table in ("rate_codes", "zones", "trips"):
         cur = conn.execute(f"SELECT COUNT(*) FROM {table}")
         count = cur.fetchone()[0]
@@ -167,40 +171,26 @@ def verify(conn: sqlite3.Connection) -> None:
 def main():
     print("=" * 60)
     print("  DATABASE INSERT")
-    print(f"  Target: {DB_URL}")
+    print(f"  DB  : {DB_PATH}")
+    print(f"  Data: {DATA_DIR}")
     print("=" * 60)
 
-    if DB_URL.startswith("sqlite"):
-        db_path = DB_URL.replace("sqlite:///", "")
-        conn = get_sqlite_conn(db_path)
+    if not DATA_DIR.exists():
+        print(f"\n[insert] ERROR: data/processed/ folder not found at:\n  {DATA_DIR}")
+        print("  → Run  python run_pipeline.py  first to generate it.")
+        sys.exit(1)
+
+    conn = get_conn()
+    try:
         apply_schema(conn)
         insert_zones(conn)
         insert_trips(conn)
         verify(conn)
+    finally:
         conn.close()
-        print(f"\n[insert] Database saved to {db_path}")
-    else:
-        # PostgreSQL path using SQLAlchemy + pandas to_sql
-        try:
-            from sqlalchemy import create_engine
-        except ImportError:
-            print("[insert] Install sqlalchemy: pip install sqlalchemy psycopg2-binary")
-            sys.exit(1)
 
-        engine = create_engine(DB_URL)
-        zones  = pd.read_csv(ZONES_FILE)
-        zones.columns = [c.lower() for c in zones.columns]
-        zones.rename(columns={"locationid":"zone_id","zone":"zone_name"}, inplace=True)
-        zones.to_sql("zones", engine, if_exists="append", index=False)
-
-        df = pd.read_parquet(TRIPS_FILE)
-        df.rename(columns=COLUMN_MAP, inplace=True)
-        for col in TRIP_COLS:
-            if col not in df.columns:
-                df[col] = None
-        df[TRIP_COLS].to_sql("trips", engine, if_exists="append", index=False,
-                              chunksize=BATCH_SIZE, method="multi")
-        print("[insert] PostgreSQL load complete.")
+    print(f"\n[insert] Database saved to: {DB_PATH}")
+    print("\nNext step: python backend/app.py")
 
 
 if __name__ == "__main__":
