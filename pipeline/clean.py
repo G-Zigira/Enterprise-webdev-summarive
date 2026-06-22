@@ -1,33 +1,19 @@
-"""
-clean.py
-========
-Task 1 – Data Processing & Cleaning
-Step 2: Identify and resolve missing values, duplicates, and outliers.
-
-All exclusions are logged to cleaning_log.py for the technical report.
-
-Usage:
-    from pipeline.clean import clean_trips
-    cleaned_df, log = clean_trips(raw_df)
-"""
-
 import pandas as pd
 import numpy as np
 from pipeline.cleaning_log import CleaningLog
 
 
 # Constants (physical/logical bounds) 
-MIN_FARE        = 2.50      # NYC TLC minimum fare
-MAX_FARE        = 500.00    # plausible upper bound
-MIN_DISTANCE    = 0.01      # miles (anything less is a meter — sensor noise)
-MAX_DISTANCE    = 150.0     # miles (longest plausible NYC trip)
-MIN_DURATION    = 60        # seconds (less = almost certainly a data error)
-MAX_DURATION    = 10_800    # seconds = 3 hours
+MIN_FARE        = 2.50      
+MAX_FARE        = 500.00    
+MIN_DISTANCE    = 0.01     
+MAX_DISTANCE    = 150.0    
+MIN_DURATION    = 60       
+MAX_DURATION    = 10_800    
 MIN_PASSENGERS  = 1
-MAX_PASSENGERS  = 6         # NYC TLC max occupancy
+MAX_PASSENGERS  = 6         
 VALID_PAYMENT   = {1, 2, 3, 4, 5, 6}
 VALID_RATE_CODE = {1, 2, 3, 4, 5, 6}
-# NOTE: the source file is yellow_tripdata_2019-01.csv (January 2019).
 DATE_START      = "2019-01-01"
 DATE_END        = "2019-01-31 23:59:59"
 
@@ -52,17 +38,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     original_len = len(df)
     log.record("original_count", original_len, "Raw records loaded")
 
-<<<<<<< HEAD
-    # 1. Standardise column names
-    df = df.copy()
-=======
-    # ── 1. Standardise column names ────────────────────────────────────────
-    # NOTE: no df.copy() here — copying a 7M+ row frame just to rename
-    # columns roughly doubles peak memory at the start of the pipeline,
-    # which matters on memory-constrained machines. We rename in place;
-    # callers that need the original raw frame preserved should pass
-    # df.copy() themselves.
->>>>>>> b159101893bece504c233ad3979e306199382079
+    # 1. Normalize column names
     df.columns = [c.strip().lower() for c in df.columns]
 
     #  2. Drop exact duplicates
@@ -143,15 +119,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
         df["ratecodeid"] = df["ratecodeid"].astype(int)
         log.record("invalid_rate_code", before - len(df), "Unknown ratecodeid codes")
 
-<<<<<<< HEAD
-    # 10. Fill remaining non-critical nulls
-=======
-    # ── 9b. Cast remaining ID/categorical columns to native ints ──────────
-    # These arrive as float64 from data_loader.py (to tolerate nulls before
-    # cleaning); by this point all nulls have been dropped/filtered, so it's
-    # safe to cast to plain Python-compatible int dtypes. This matters for
-    # SQLite CHECK constraints at insert time, which can misbehave with
-    # pandas nullable/extension dtypes.
+
     if "vendorid" in df.columns:
         df["vendorid"] = df["vendorid"].astype(int)
     if "pulocationid" in df.columns:
@@ -159,8 +127,7 @@ def clean_trips(df: pd.DataFrame, log: CleaningLog | None = None) -> tuple[pd.Da
     if "dolocationid" in df.columns:
         df["dolocationid"] = df["dolocationid"].astype(int)
 
-    # ── 10. Fill remaining non-critical nulls ──────────────────────────────
->>>>>>> b159101893bece504c233ad3979e306199382079
+    # 10. Fill remaining non-critical nulls
     if "tip_amount"   in df.columns: df["tip_amount"]   = df["tip_amount"].fillna(0.0)
     if "tolls_amount" in df.columns: df["tolls_amount"] = df["tolls_amount"].fillna(0.0)
     if "mta_tax"      in df.columns: df["mta_tax"]      = df["mta_tax"].fillna(0.5)
