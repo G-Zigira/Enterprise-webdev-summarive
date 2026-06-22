@@ -1,6 +1,4 @@
-/* style.css — enterprise layout & component system */
-
-/* ── Reset & base ───────────────────────────────────────────────────────────── */
+/* Reset & base  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 14px; }
@@ -16,7 +14,7 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
-/* ── Layout ─────────────────────────────────────────────────────────────────── */
+/*Layout */
 .layout {
   flex: 1;
   margin-left: 220px;
@@ -26,7 +24,7 @@ body {
   transition: margin-left 0.25s ease;
 }
 
-/* ── Sidebar ─────────────────────────────────────────────────────────────────── */
+/*  Sidebar  */
 .sidebar {
   position: fixed;
   top: 0; left: 0; bottom: 0;
@@ -142,7 +140,7 @@ body {
 .theme-toggle:hover { background: var(--bg-overlay); color: var(--text-primary); }
 .theme-toggle i { font-size: 15px; }
 
-/* ── Topbar ──────────────────────────────────────────────────────────────────── */
+/* Topbar  */
 .topbar {
   height: 54px;
   background: var(--bg-surface);
@@ -199,7 +197,7 @@ body {
   50%       { box-shadow: 0 0 0 5px var(--green-dim); }
 }
 
-/* ── Main content ────────────────────────────────────────────────────────────── */
+/*Main content */
 .main-content {
   flex: 1;
   padding: 24px;
@@ -207,7 +205,7 @@ body {
   width: 100%;
 }
 
-/* ── Page header ─────────────────────────────────────────────────────────────── */
+/*Page header  */
 .page-header {
   margin-bottom: 22px;
 }
@@ -224,7 +222,7 @@ body {
   color: var(--text-secondary);
 }
 
-/* ── Cards ───────────────────────────────────────────────────────────────────── */
+/*  Cards  */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -242,7 +240,7 @@ body {
   margin-bottom: 14px;
 }
 
-/* ── Metric cards ────────────────────────────────────────────────────────────── */
+/* Metric cards  */
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
@@ -293,15 +291,15 @@ body {
   color: var(--text-tertiary);
 }
 
-/* ── Grid layouts ────────────────────────────────────────────────────────────── */
+/* Grid layouts  */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .mb-14  { margin-bottom: 14px; }
 
-/* ── Chart wrapper ───────────────────────────────────────────────────────────── */
+/* Chart wrapper*/
 .chart-wrap { position: relative; width: 100%; }
 
-/* ── Progress bars ───────────────────────────────────────────────────────────── */
+/* Progress bars  */
 .prog-row {
   display: flex;
   align-items: center;
@@ -341,7 +339,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Heatmap ─────────────────────────────────────────────────────────────────── */
+/*Heatmap  */
 .heatmap-wrap { overflow-x: auto; padding-bottom: 4px; }
 
 .heatmap-grid {
@@ -399,7 +397,7 @@ body {
 
 .hm-cell:hover .hm-tooltip { opacity: 1; }
 
-/* ── Data table ──────────────────────────────────────────────────────────────── */
+/*Data table */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -432,7 +430,7 @@ body {
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tbody tr:hover td { background: var(--bg-hover); }
 
-/* ── Badges ──────────────────────────────────────────────────────────────────── */
+/* Badges  */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -450,7 +448,7 @@ body {
 .badge-purple { background: var(--purple-dim);  color: var(--purple); }
 .badge-teal   { background: var(--teal-dim);    color: var(--teal); }
 
-/* ── Insight cards ────────────────────────────────────────────────────────────── */
+/* Insight cards  */
 .insight-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -473,7 +471,7 @@ body {
   line-height: 1.65;
 }
 
-/* ── Code blocks ─────────────────────────────────────────────────────────────── */
+/* Code blocks  */
 .code-block {
   background: var(--bg-canvas);
   border: 1px solid var(--border-subtle);
@@ -493,7 +491,7 @@ body {
 .code-cmt  { color: var(--text-tertiary); font-style: italic; }
 .code-num  { color: var(--amber); }
 
-/* ── Schema tables ───────────────────────────────────────────────────────────── */
+/*Schema tables */
 .schema-box {
   background: var(--bg-overlay);
   border: 1px solid var(--border-subtle);
@@ -541,7 +539,7 @@ body {
 
 .schema-col-note { color: var(--text-tertiary); font-size: 11px; }
 
-/* ── Algo steps ──────────────────────────────────────────────────────────────── */
+/* Algo steps */
 .algo-step {
   display: flex;
   gap: 14px;
@@ -567,7 +565,7 @@ body {
   padding-top: 4px;
 }
 
-/* ── Complexity badges ───────────────────────────────────────────────────────── */
+/* Complexity badges*/
 .complexity-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -605,7 +603,7 @@ body {
   margin-top: 3px;
 }
 
-/* ── Legend ──────────────────────────────────────────────────────────────────── */
+/*Legend  */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -623,7 +621,7 @@ body {
   flex-shrink: 0;
 }
 
-/* ── Table pager ─────────────────────────────────────────────────────────────── */
+/* Table pager */
 .pager {
   display: flex;
   align-items: center;
@@ -651,7 +649,7 @@ body {
 .pager-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 .pager-btn:disabled { opacity: 0.4; cursor: default; }
 
-/* ── Filter bar ──────────────────────────────────────────────────────────────── */
+/*Filter bar  */
 .filter-bar {
   display: flex;
   gap: 10px;
@@ -681,7 +679,7 @@ body {
 
 .filter-input { min-width: 180px; }
 
-/* ── ER diagram ──────────────────────────────────────────────────────────────── */
+/*  ER diagram */
 .er-diagram {
   display: flex;
   align-items: center;
@@ -709,13 +707,13 @@ body {
 
 .er-arrow { color: var(--text-tertiary); font-size: 11px; }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────────── */
+/*Scrollbar  */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
-/* ── Responsive ──────────────────────────────────────────────────────────────── */
+/*Responsive  */
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }

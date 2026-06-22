@@ -1,15 +1,7 @@
-/**
- * data.js
- * Simulated data layer — mirrors what the Flask API returns.
- * When running with the backend, replace DATA.fetch() calls with
- * real fetch('/api/...') calls in main.js.
- *
- * All numbers are realistic approximations of NYC Yellow Taxi Jan 2024.
- */
 
 const DATA = (() => {
 
-  // ── Zone lookup (real data from taxi_zone_lookup.csv) ──────────────────
+  // Zone lookup real data from taxi_zone_lookup.csv
   const ZONES = [
     {zone_id:1,  zone_name:"Newark Airport",               borough:"EWR",          service_zone:"EWR",         total_trips:420,  avg_fare:52.10},
     {zone_id:4,  zone_name:"Alphabet City",                borough:"Manhattan",    service_zone:"Yellow Zone", total_trips:3820, avg_fare:14.80},
@@ -98,12 +90,12 @@ const DATA = (() => {
     {zone_id:263,zone_name:"Yorkville West",               borough:"Manhattan",    service_zone:"Yellow Zone", total_trips:3800, avg_fare:15.60},
   ];
 
-  // ── Hourly baseline (avg trips/hr across Jan 2024) ──────────────────────
+  //Hourly baseline (avg trips/hr across Jan 2024) 
   const HOURLY_TRIPS  = [320,210,140,100,130,280,620,1100,1350,1200,1050,1100,1180,1120,1050,1080,1200,1420,1500,1380,1150,950,780,530];
   const HOURLY_FARES  = [28.4,31.2,33.8,35.1,32.6,27.4,19.8,16.2,15.8,16.4,17.2,17.8,18.1,17.9,17.4,17.6,18.4,19.2,19.8,19.4,18.6,18.1,20.4,24.8];
   const HOURLY_SPEEDS = [26.8,27.4,27.9,28.2,27.1,24.6,18.4,12.1,10.8,11.4,12.8,13.2,13.6,13.8,13.4,12.9,11.4,10.2,10.8,11.6,13.4,15.2,18.6,22.4];
 
-  // ── Daily trips (Jan 1–31, 2024) ───────────────────────────────────────
+  // Daily trips (Jan 1–31, 2024) 
   const DAILY = [
     {pickup_date:"2024-01-01",trips:71400,avg_fare:19.2},
     {pickup_date:"2024-01-02",trips:98600,avg_fare:18.1},
@@ -138,7 +130,7 @@ const DATA = (() => {
     {pickup_date:"2024-01-31",trips:110400,avg_fare:17.5},
   ];
 
-  // ── Heatmap (dow × hour) ────────────────────────────────────────────────
+  // Heatmap (dow × hour) 
   const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const HEATMAP = DAYS.map((d, di) => ({
     day: d,
@@ -150,7 +142,7 @@ const DATA = (() => {
     })
   }));
 
-  // ── Public API ──────────────────────────────────────────────────────────
+  //Public API
   return {
     kpis() {
       return {

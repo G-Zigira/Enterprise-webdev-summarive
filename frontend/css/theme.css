@@ -1,6 +1,6 @@
-/* theme.css — CSS custom properties for light and dark mode */
 
-/* ── Dark theme (default) ──────────────────────────────────────────────────── */
+
+/* Dark theme  */
 [data-theme="dark"] {
   /* Backgrounds */
   --bg-canvas:      #0d0f12;
@@ -57,7 +57,7 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
 }
 
-/* ── Light theme ───────────────────────────────────────────────────────────── */
+/*Light theme  */
 [data-theme="light"] {
   --bg-canvas:      #f0f2f5;
   --bg-surface:     #ffffff;

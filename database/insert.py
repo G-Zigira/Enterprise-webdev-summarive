@@ -25,7 +25,7 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 
-# ── Config ────────────────────────────────────────────────────────────────────
+#  Config 
 DB_URL      = os.getenv("DB_URL", "sqlite:///nyc_taxi.db")
 BATCH_SIZE  = int(os.getenv("BATCH_SIZE", "10000"))
 SCHEMA_FILE = Path(__file__).parent / "schema.sql"
@@ -34,7 +34,7 @@ DATA_DIR    = Path("data/processed")
 TRIPS_FILE  = DATA_DIR / "trips_cleaned.parquet"
 ZONES_FILE  = DATA_DIR / "zones_clean.csv"
 
-# Columns in trips parquet → renamed to match DB schema
+# Columns in trips parquet are renamed to match DB schematics
 COLUMN_MAP = {
     "tpep_pickup_datetime":    "pickup_datetime",
     "tpep_dropoff_datetime":   "dropoff_datetime",
@@ -44,7 +44,7 @@ COLUMN_MAP = {
     "store_and_fwd_flag":      "store_fwd_flag",
 }
 
-# Columns to write to the trips table (must match schema.sql)
+# Columns to write to the trips table and they must match schema.sql
 TRIP_COLS = [
     "pickup_datetime","dropoff_datetime",
     "pu_zone_id","do_zone_id","rate_code_id",
@@ -58,11 +58,11 @@ TRIP_COLS = [
 ]
 
 
-# ── SQLite helpers ────────────────────────────────────────────────────────────
+#  SQLite helpers 
 
 def get_sqlite_conn(path: str = "nyc_taxi.db") -> sqlite3.Connection:
     conn = sqlite3.connect(path)
-    conn.execute("PRAGMA journal_mode=WAL")   # faster writes
+    conn.execute("PRAGMA journal_mode=WAL")   #  writes faster
     conn.execute("PRAGMA synchronous=NORMAL")
     conn.execute("PRAGMA cache_size=-64000")  # 64 MB cache
     conn.execute("PRAGMA foreign_keys=ON")
@@ -73,19 +73,19 @@ def apply_schema(conn: sqlite3.Connection, schema_path: Path = SCHEMA_FILE) -> N
     """Execute schema.sql against the connection."""
     print(f"[insert] Applying schema from {schema_path} …")
     sql = schema_path.read_text(encoding="utf-8")
-    # Remove PostgreSQL-only comments/syntax for SQLite
+    # Removes PostgreSQL-only comments/syntax for SQLite
     conn.executescript(sql)
     conn.commit()
     print("[insert] Schema applied.")
 
 
-# ── Zone insertion ────────────────────────────────────────────────────────────
+#  Zone insertion 
 
 def insert_zones(conn: sqlite3.Connection, zones_path: Path = ZONES_FILE) -> None:
     """Insert zone lookup rows into the zones dimension table."""
     print(f"[insert] Loading zones from {zones_path} …")
     df = pd.read_csv(zones_path)
-    # Normalise column names
+    # Normalises the column names
     df.columns = [c.strip().lower() for c in df.columns]
     df.rename(columns={"locationid":"zone_id","zone":"zone_name"}, inplace=True, errors="ignore")
 
@@ -98,8 +98,7 @@ def insert_zones(conn: sqlite3.Connection, zones_path: Path = ZONES_FILE) -> Non
     print(f"[insert] Inserted {len(rows):,} zone records.")
 
 
-# ── Trip insertion ────────────────────────────────────────────────────────────
-
+#  Trip insertion 
 def insert_trips(conn: sqlite3.Connection, trips_path: Path = TRIPS_FILE) -> None:
     """
     Batch-insert all cleaned trip rows.
@@ -112,21 +111,21 @@ def insert_trips(conn: sqlite3.Connection, trips_path: Path = TRIPS_FILE) -> Non
     print(f"[insert] Loading enriched trips from {trips_path} …")
     df = pd.read_parquet(trips_path)
 
-    # ── Rename columns to match DB schema ────────────────────────────────
+    #  Renames the columns to match DB schema 
     df.rename(columns=COLUMN_MAP, inplace=True)
 
-    # ── Ensure all required columns exist (fill missing with None) ────────
+    #  Ensure all required columns exist (fill missing with None)
     for col in TRIP_COLS:
         if col not in df.columns:
             df[col] = None
 
-    # ── Coerce types for SQLite compatibility ─────────────────────────────
+    # Coerce types for SQLite compatibility 
     df["pickup_datetime"]  = df["pickup_datetime"].astype(str)
     df["dropoff_datetime"] = df["dropoff_datetime"].astype(str)
     if "pickup_date" in df.columns:
         df["pickup_date"] = df["pickup_date"].astype(str)
 
-    df = df[TRIP_COLS]   # keep only schema columns, in order
+    df = df[TRIP_COLS]   # keeps only theschema columns in order
 
     total     = len(df)
     inserted  = 0
@@ -139,7 +138,7 @@ def insert_trips(conn: sqlite3.Connection, trips_path: Path = TRIPS_FILE) -> Non
 
     for start in range(0, total, BATCH_SIZE):
         chunk = df.iloc[start : start + BATCH_SIZE]
-        # Convert each row to a plain Python tuple (sqlite3 requires it)
+        # Converts each row to a plain Python tuple (sqlite3 requires it)
         rows = [tuple(r) for r in chunk.itertuples(index=False, name=None)]
         conn.executemany(sql, rows)
         conn.commit()
@@ -152,7 +151,7 @@ def insert_trips(conn: sqlite3.Connection, trips_path: Path = TRIPS_FILE) -> Non
     print(f"\n[insert] Done. {inserted:,} trip rows inserted in {elapsed:.1f}s.")
 
 
-# ── Verification ──────────────────────────────────────────────────────────────
+#  Verification
 
 def verify(conn: sqlite3.Connection) -> None:
     """Print row counts for each table to confirm successful load."""
@@ -164,8 +163,7 @@ def verify(conn: sqlite3.Connection) -> None:
     print("─" * 48)
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
-
+# Main 
 def main():
     print("=" * 60)
     print("  DATABASE INSERT")

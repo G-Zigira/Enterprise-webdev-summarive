@@ -1,15 +1,5 @@
--- =============================================================
--- queries.sql
--- Task 2 – Database Design & Implementation
--- Analytical query library for the NYC Taxi Dashboard API.
--- Each query is named and maps to a backend API endpoint.
--- Compatible with SQLite and PostgreSQL.
--- =============================================================
-
-
--- ──────────────────────────────────────────────────────────────
 -- OVERVIEW / KPI QUERIES
--- ──────────────────────────────────────────────────────────────
+
 
 -- [GET /api/kpis]  Top-level summary statistics
 SELECT
@@ -48,9 +38,9 @@ GROUP BY pickup_hour
 ORDER BY pickup_hour;
 
 
--- ──────────────────────────────────────────────────────────────
+
 -- BOROUGH & ZONE QUERIES
--- ──────────────────────────────────────────────────────────────
+
 
 -- [GET /api/borough-summary]  Trips & revenue by pickup borough
 SELECT
@@ -109,9 +99,9 @@ GROUP BY z.service_zone
 ORDER BY avg_fare DESC;
 
 
--- ──────────────────────────────────────────────────────────────
+
 -- FARE ANALYSIS QUERIES
--- ──────────────────────────────────────────────────────────────
+
 
 -- [GET /api/payment-breakdown]  Trips & tips by payment type
 SELECT
@@ -165,9 +155,8 @@ GROUP BY pickup_hour
 ORDER BY pickup_hour;
 
 
--- ──────────────────────────────────────────────────────────────
 -- TRIP PATTERN QUERIES
--- ──────────────────────────────────────────────────────────────
+
 
 -- [GET /api/distance-distribution]
 SELECT
@@ -208,10 +197,8 @@ SELECT
 FROM trips
 GROUP BY is_rush_hour;
 
-
--- ──────────────────────────────────────────────────────────────
 -- INSIGHT QUERIES (used in Insights page)
--- ──────────────────────────────────────────────────────────────
+
 
 -- Insight 1: Airport vs city fare comparison
 SELECT
@@ -249,9 +236,9 @@ GROUP BY payment_type
 ORDER BY avg_tip_pct DESC;
 
 
--- ──────────────────────────────────────────────────────────────
+
 -- ZONE EXPLORER (filterable, paginated)
--- ──────────────────────────────────────────────────────────────
+
 
 -- [GET /api/zones?borough=Manhattan&service=Yellow+Zone&page=1]
 -- Replace :borough, :service, :limit, :offset with parameters

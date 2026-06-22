@@ -1,11 +1,8 @@
-/**
- * main.js — Page router and HTML builder for all dashboard pages.
- * Injects page HTML into #mainContent, then wires up charts/modules.
- */
+
 
 (function () {
 
-  // ── Page registry ─────────────────────────────────────────────────────
+  // Page registry
   const PAGES = {
     overview: { label: 'Overview',      build: buildOverview,  init: initOverview  },
     trips:    { label: 'Trip Patterns',  build: buildTrips,     init: initTrips     },
@@ -18,8 +15,7 @@
 
   let currentPage = 'overview';
 
-  // ── Router ────────────────────────────────────────────────────────────
-  function showPage(name) {
+  //  Router 
     if (!PAGES[name]) return;
     currentPage = name;
 
@@ -36,7 +32,7 @@
     });
   }
 
-  // ── Theme toggle ──────────────────────────────────────────────────────
+  // Theme toggle 
   function initTheme() {
     const root  = document.documentElement;
     const btn   = document.getElementById('themeToggle');
@@ -62,7 +58,7 @@
     }
   }
 
-  // ── Sidebar toggle (mobile) ───────────────────────────────────────────
+  //  Sidebar toggle (mobile) 
   function initSidebar() {
     document.getElementById('sidebarToggle')?.addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('open');
@@ -75,11 +71,9 @@
     });
   }
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // PAGE HTML BUILDERS
-  // ═══════════════════════════════════════════════════════════════════════
 
-  // ── OVERVIEW ──────────────────────────────────────────────────────────
+
+  //  OVERVIEW 
   function buildOverview() {
     const k = DATA.kpis();
     return `
@@ -123,7 +117,7 @@
     CHARTS.renderHourlyBar('hourlyChart');
   }
 
-  // ── TRIPS ─────────────────────────────────────────────────────────────
+  //TRIPS
   function buildTrips() {
     const top = DATA.topZones(10);
     const maxTrips = top[0]?.total_trips || 1;
@@ -220,7 +214,7 @@
     }
   }
 
-  // ── FARES ─────────────────────────────────────────────────────────────
+  // FARES
   function buildFares() {
     const k = DATA.kpis();
     const pay = DATA.paymentBreakdown();
@@ -281,7 +275,7 @@
     CHARTS.renderFareHour('fareHourChart');
   }
 
-  // ── ZONES ─────────────────────────────────────────────────────────────
+  //ZONES
   function buildZones() {
     return `
       <div class="page-header">
@@ -339,7 +333,7 @@
 
   function initZones() { ZONES_MODULE.init(); }
 
-  // ── SCHEMA ────────────────────────────────────────────────────────────
+  //SCHEMA
   function buildSchema() {
     return `
       <div class="page-header">
@@ -459,7 +453,7 @@
     return `<div class="schema-box"><div class="schema-box-header">${title}</div>${rowsHtml}</div>`;
   }
 
-  // ── ALGORITHM ─────────────────────────────────────────────────────────
+  // ALGORITHM 
   function buildAlgo() {
     return `
       <div class="page-header">
@@ -551,7 +545,7 @@
 
   function initAlgo() { ALGO.init(); }
 
-  // ── INSIGHTS ──────────────────────────────────────────────────────────
+  // INSIGHTS
   function buildInsights() {
     return `
       <div class="page-header">
@@ -593,7 +587,7 @@
     CHARTS.renderInsight3('insightChart3');
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────
+  // Helpers
   function metricCard(label, value, sub) {
     return `
       <div class="metric-card">
@@ -603,11 +597,11 @@
       </div>`;
   }
 
-  // ── Boot ──────────────────────────────────────────────────────────────
+  //  Boot
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initSidebar();
     showPage('overview');
   });
 
-})();
+)();

@@ -1,29 +1,14 @@
--- =============================================================
--- schema.sql
--- Task 2 – Database Design & Implementation
--- 
--- Normalized relational schema for the NYC Yellow Taxi dataset.
--- Compatible with PostgreSQL and SQLite (minor dialect notes below).
---
--- Tables
---   rate_codes   – dimension: maps rate_code_id to description
---   zones        – dimension: borough & service zone per location ID
---   trips        – fact: one row per cleaned trip record
---
--- Run: psql -U <user> -d nyc_taxi -f schema.sql
---      OR: sqlite3 nyc_taxi.db < schema.sql
--- =============================================================
 
 PRAGMA foreign_keys = ON;   -- SQLite only; remove for PostgreSQL
 
 
--- ── Drop in reverse dependency order ────────────────────────────────────────
+--  Drop in reverse dependency order 
 DROP TABLE IF EXISTS trips;
 DROP TABLE IF EXISTS zones;
 DROP TABLE IF EXISTS rate_codes;
 
 
--- ── Dimension: rate_codes ────────────────────────────────────────────────────
+-- Dimension: rate_codes
 -- Stores the six TLC rate code categories.
 -- Kept separate to avoid string repetition across 3M+ trip rows.
 CREATE TABLE rate_codes (
@@ -40,7 +25,7 @@ INSERT INTO rate_codes VALUES
     (6, 'Group ride');
 
 
--- ── Dimension: zones ─────────────────────────────────────────────────────────
+--  Dimension: zones 
 -- One row per TLC taxi zone (263 zones + 2 special rows).
 -- Sourced from taxi_zone_lookup.csv.
 CREATE TABLE zones (
@@ -55,7 +40,7 @@ CREATE INDEX idx_zones_borough ON zones(borough);
 CREATE INDEX idx_zones_service ON zones(service_zone);
 
 
--- ── Fact: trips ───────────────────────────────────────────────────────────────
+-- Fact: trips 
 -- One row per cleaned trip record from yellow_tripdata_2024-01.parquet.
 -- Foreign keys enforce referential integrity with dimension tables.
 CREATE TABLE trips (
@@ -90,7 +75,7 @@ CREATE TABLE trips (
     -- Payment
     payment_type       SMALLINT    NOT NULL,   -- 1=CC 2=Cash 3=NoCharge 4=Dispute
 
-    -- ── Derived / engineered features ─────────────────────────────────────
+    -- Derived / engineered features 
     trip_duration_sec  INTEGER     NOT NULL,           -- Feature 1
     speed_mph          DECIMAL(5,2),                   -- Feature 2
     tip_pct            DECIMAL(5,2) NOT NULL DEFAULT 0, -- Feature 3
@@ -115,7 +100,7 @@ CREATE TABLE trips (
 );
 
 
--- ── Performance indexes (trips fact table) ───────────────────────────────────
+-- Performance indexes (trips fact table) 
 -- Chosen based on the most common dashboard filter/aggregate patterns.
 
 -- Time-series queries (daily/hourly aggregations)
@@ -136,22 +121,3 @@ CREATE INDEX idx_trips_rush        ON trips(is_rush_hour);
 CREATE INDEX idx_trips_airport     ON trips(is_airport_trip);
 CREATE INDEX idx_trips_rate_code   ON trips(rate_code_id);
 
-
--- =============================================================
--- SAMPLE ANALYTICAL QUERIES (documented here for reference)
--- Full query library is in queries.sql
--- =============================================================
-
--- Daily trip count
--- SELECT pickup_date, COUNT(*) AS trips
--- FROM trips GROUP BY pickup_date ORDER BY pickup_date;
-
--- Top 10 pickup zones
--- SELECT z.zone_name, z.borough, COUNT(*) AS trips
--- FROM trips t JOIN zones z ON t.pu_zone_id = z.zone_id
--- GROUP BY z.zone_id ORDER BY trips DESC LIMIT 10;
-
--- Avg fare by payment type
--- SELECT payment_type, AVG(fare_amount) AS avg_fare,
---        AVG(tip_pct) AS avg_tip_pct
--- FROM trips GROUP BY payment_type;

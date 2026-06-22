@@ -1,18 +1,15 @@
-/**
- * charts.js — Chart.js wrapper utilities
- * All charts use CSS variable colours and share consistent axis/grid styling.
- */
+
 
 const CHARTS = (() => {
 
-  // ── Chart registry — destroy before re-render ─────────────────────────
+  // Chart registry — destroy before re-render 
   const registry = {};
 
   function destroy(id) {
     if (registry[id]) { registry[id].destroy(); delete registry[id]; }
   }
 
-  // ── Shared defaults ───────────────────────────────────────────────────
+  //Shared defaults 
   function getCSSVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
@@ -56,8 +53,7 @@ const CHARTS = (() => {
     }
   });
 
-  // ── Factory ───────────────────────────────────────────────────────────
-  function make(id, type, labels, datasets, extraOpts = {}) {
+  // Factory 
     destroy(id);
     const canvas = document.getElementById(id);
     if (!canvas) return null;
@@ -82,8 +78,7 @@ const CHARTS = (() => {
     return out;
   }
 
-  // ── Specific chart builders ───────────────────────────────────────────
-
+  //Specific chart builders 
   function line(id, labels, data, color, opts = {}) {
     const c = color || getColors()[0];
     return make(id, 'line', labels, [{
@@ -138,8 +133,7 @@ const CHARTS = (() => {
     }], deepMerge({ cutout: '65%', plugins: { legend: { display: false } } }, opts));
   }
 
-  // ── Daily trip line (overview) ─────────────────────────────────────────
-  function renderDailyTrips(canvasId) {
+  // Daily trip line (overview)
     const rows  = DATA.dailyTrips();
     const labels = rows.map(r => r.pickup_date.slice(5));   // MM-DD
     const values = rows.map(r => r.trips);
@@ -154,9 +148,9 @@ const CHARTS = (() => {
         label: ctx => `${(ctx.parsed.y/1000).toFixed(1)}k trips`
       }}}
     });
-  }
 
-  // ── Borough bar ────────────────────────────────────────────────────────
+
+  // Borough bar
   function renderBoroughBar(canvasId) {
     const rows = DATA.boroughSummary();
     const labels = rows.map(r => r.borough);
@@ -170,7 +164,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Hourly volume bar ─────────────────────────────────────────────────
+  // Hourly volume bar 
   function renderHourlyBar(canvasId) {
     const rows = DATA.hourlyVolume();
     const labels = rows.map(r => r.hour + ':00');
@@ -187,7 +181,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Distance histogram ─────────────────────────────────────────────────
+  // Distance histogram 
   function renderDistBar(canvasId) {
     const rows = DATA.distanceDist();
     return bar(canvasId, rows.map(r=>r.bucket), rows.map(r=>r.pct), getCSSVar('--c2'), {
@@ -195,7 +189,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Duration histogram ─────────────────────────────────────────────────
+  //Duration histogram 
   function renderDurBar(canvasId) {
     const data  = [8,22,26,19,14,7,4];
     const lbls  = ['0–5 min','5–10','10–15','15–20','20–30','30–45','45+'];
@@ -204,13 +198,13 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Payment doughnut ───────────────────────────────────────────────────
+  // Payment doughnut 
   function renderPayDoughnut(canvasId) {
     const rows = DATA.paymentBreakdown();
     return doughnut(canvasId, rows.map(r=>r.label), rows.map(r=>r.pct));
   }
 
-  // ── Fare distribution bar ──────────────────────────────────────────────
+  // Fare distribution bar 
   function renderFareDist(canvasId) {
     const rows = DATA.fareDistribution();
     return bar(canvasId, rows.map(r=>r.bucket), rows.map(r=>r.pct), getCSSVar('--c3'), {
@@ -218,7 +212,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Fare by hour ───────────────────────────────────────────────────────
+  //Fare by hour 
   function renderFareHour(canvasId) {
     const rows = DATA.fareByHour();
     const labels = rows.map(r => r.hour+':00');
@@ -231,7 +225,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Insight 1: avg fare by service zone ───────────────────────────────
+  //  Insight 1: avg fare by service zone
   function renderInsight1(canvasId) {
     const rows = DATA.insightAirport();
     const colors = getColors();
@@ -241,7 +235,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Insight 2: speed + fare/min dual axis ─────────────────────────────
+  // Insight 2: speed + fare/min dual axis 
   function renderInsight2(canvasId) {
     const rows = DATA.insightNight();
     const labels = rows.map(r => r.hour+':00');
@@ -260,7 +254,7 @@ const CHARTS = (() => {
     });
   }
 
-  // ── Insight 3: tip rate by payment ────────────────────────────────────
+  //Insight 3: tip rate by payment
   function renderInsight3(canvasId) {
     const rows = DATA.insightTips();
     const colors = [getCSSVar('--c1'), getCSSVar('--text-tertiary'), getCSSVar('--c2'), getCSSVar('--c4')];
@@ -280,4 +274,4 @@ const CHARTS = (() => {
     renderPayDoughnut, renderFareDist, renderFareHour,
     renderInsight1, renderInsight2, renderInsight3,
   };
-})();
+)();

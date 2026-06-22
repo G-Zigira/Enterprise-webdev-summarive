@@ -1,4 +1,4 @@
-# ── Core data pipeline ─────────────────────────────────────────
+# Core data pipeline
 pandas==2.2.2
 pyarrow==16.1.0          # parquet file support
 geopandas==0.14.4         # shapefile (.shp) support
@@ -6,13 +6,13 @@ shapely==2.0.4            # geometry operations
 fiona==1.9.6              # shapefile I/O backend for geopandas
 numpy==1.26.4
 
-# ── Database ────────────────────────────────────────────────────
+# Database 
 sqlalchemy==2.0.30        # ORM / PostgreSQL adapter (optional)
 psycopg2-binary==2.9.9    # PostgreSQL driver (optional, skip for SQLite)
 
-# ── Backend API ─────────────────────────────────────────────────
+# Backend API 
 flask==3.0.3
 flask-cors==4.0.1
 
-# ── Dev / utilities ─────────────────────────────────────────────
+# Dev / utilities
 python-dotenv==1.0.1      # load .env files

@@ -1,7 +1,3 @@
-/**
- * zones.js — Zone Explorer page logic
- * Filterable, sortable, paginated zone table.
- */
 
 const ZONES_MODULE = (() => {
 

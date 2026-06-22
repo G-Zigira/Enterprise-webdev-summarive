@@ -1,12 +1,7 @@
-/**
- * algo.js — Custom max-heap top-k implementation
- * No built-in sort(), Counter, or heapq used.
- * Used on the Algorithm page to demonstrate custom data structures.
- */
 
 const ALGO = (() => {
 
-  // ── Manual max-heap (array-backed) ────────────────────────────────────
+  // Manual max-heap (array-backed)
   // Each element: [count, zone_id, zone_name, borough]
 
   function siftDown(heap, i, n) {
@@ -63,7 +58,7 @@ const ALGO = (() => {
     return result;
   }
 
-  // ── Render live demo ───────────────────────────────────────────────────
+  // Render live demo 
   const BOROUGH_COLORS = {
     'Manhattan':    'var(--c1)',
     'Queens':       'var(--c2)',

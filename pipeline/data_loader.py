@@ -1,20 +1,11 @@
-"""
-data_loader.py
-==============
-Task 1 – Data Processing & Cleaning
-Step 1: Load raw source files (parquet, CSV, shapefile) into memory.
 
-Usage:
-    from pipeline.data_loader import load_all
-    trips, zones, spatial = load_all()
-"""
 
 import os
 import pandas as pd
 import geopandas as gpd
 from pathlib import Path
 
-# ── Paths ──────────────────────────────────────────────────────────────────
+# Path
 ROOT          = Path(__file__).resolve().parent.parent / "data"
 PARQUET_PATH  = ROOT / "yellow_tripdata_2024-01.parquet"
 ZONE_CSV_PATH = ROOT / "taxi_zone_lookup.csv"
