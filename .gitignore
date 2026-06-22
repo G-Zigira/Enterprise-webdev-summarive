@@ -27,3 +27,6 @@ Thumbs.db
 # section for the download link. taxi_zone_lookup.csv and the shapefile
 # are small and stay tracked in git for convenience.
 data/raw/yellow_tripdata_2019-01.csv
+test_fk.db
+test_insert.db
+data/raw/yellow_tripdata_2024-01.parquet

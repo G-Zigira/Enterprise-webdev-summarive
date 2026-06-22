@@ -78,40 +78,17 @@ def apply_schema(conn: sqlite3.Connection) -> None:
     print("[insert] Schema applied.")
 
 
-def insert_zones(conn: sqlite3.Connection) -> None:
-    if not ZONES_FILE.exists():
-        print(f"[insert] ERROR: {ZONES_FILE} not found.")
-        print("  → Run  python run_pipeline.py  first, then try again.")
-        sys.exit(1)
+# ── Zone insertion ────────────────────────────────────────────────────────────
 
-    print(f"[insert] Loading zones from {ZONES_FILE} …")
-    df = pd.read_csv(ZONES_FILE)
+def insert_zones(conn: sqlite3.Connection, zones_path: Path = ZONES_FILE) -> None:
+    """Insert zone lookup rows into the zones dimension table."""
+    print(f"[insert] Loading zones from {zones_path} …")
+    df = pd.read_csv(zones_path)
+    # Normalise column names
     df.columns = [c.strip().lower() for c in df.columns]
     df.rename(columns={"locationid": "zone_id", "zone": "zone_name"}, inplace=True, errors="ignore")
 
-    for col in ["zone_id", "zone_name", "borough", "service_zone"]:
-        if col not in df.columns:
-            print(f"[insert] ERROR: expected column '{col}' missing from {ZONES_FILE}")
-            sys.exit(1)
-
-    # The TLC zone lookup includes two special placeholder rows that have
-    # blank fields in the source CSV:
-    #   264  "Unknown"          — borough='Unknown', zone_name=NaN, service_zone=NaN
-    #   265  "Outside of NYC"   — borough=NaN, zone_name="Outside of NYC", service_zone=NaN
-    # The zones table has NOT NULL on all four columns, so without this
-    # fill step these two rows are silently dropped by INSERT OR IGNORE —
-    # and any real trip whose pickup/dropoff zone is 264 or 265 then fails
-    # its foreign key check on insert. We fill blanks with explicit labels
-    # so both special zones are preserved.
-    before_na = len(df[df[["zone_name", "borough", "service_zone"]].isna().any(axis=1)])
-    if before_na:
-        print(f"[insert] NOTE: filling {before_na} zone row(s) with missing fields "
-              f"(TLC's 'Unknown'/'Outside of NYC' placeholder zones)")
-    df["zone_name"]    = df["zone_name"].fillna("Unknown")
-    df["borough"]      = df["borough"].fillna("Unknown")
-    df["service_zone"] = df["service_zone"].fillna("N/A")
-
-    rows = [tuple(r) for r in df[["zone_id", "zone_name", "borough", "service_zone"]].itertuples(index=False, name=None)]
+    rows = df[["zone_id","zone_name","borough","service_zone"]].to_records(index=False).tolist()
     conn.executemany(
         "INSERT OR IGNORE INTO zones(zone_id, zone_name, borough, service_zone) VALUES (?,?,?,?)",
         rows

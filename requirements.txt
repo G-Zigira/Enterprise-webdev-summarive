@@ -1,14 +1,16 @@
 # ── Core data pipeline ─────────────────────────────────────────
-pandas==2.2.2
-pyarrow==16.1.0          # parquet read/write + streaming batch reader (database/insert.py)
+=======
+pandas==2.2.3
+pyarrow==18.1.0          # parquet file support
+>>>>>>> Stashed changes
 geopandas==0.14.4         # shapefile (.shp) support
-shapely==2.0.4            # geometry operations
-fiona==1.9.6              # shapefile I/O backend for geopandas
-numpy==1.26.4
+shapely==2.0.7            # geometry operations
+fiona==1.10.1              # shapefile I/O backend for geopandas
+numpy==2.1.0
 
 # ── Database ────────────────────────────────────────────────────
-sqlalchemy==2.0.30        # ORM / PostgreSQL adapter (optional)
-psycopg2-binary==2.9.9    # PostgreSQL driver (optional, skip for SQLite)
+sqlalchemy==2.0.41        # ORM / PostgreSQL adapter (optional)
+psycopg2-binary==2.9.10    # PostgreSQL driver (optional, skip for SQLite)
 
 # ── Backend API ─────────────────────────────────────────────────
 flask==3.0.3
