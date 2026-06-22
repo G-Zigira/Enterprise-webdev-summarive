@@ -68,7 +68,7 @@ nyc-taxi-dashboard/
 
 | File | Rows | Description | Where to get it |
 |------|------|-------------|------------------|
-| `yellow_tripdata_2019-01.csv` | ~7.67M | Fact table — Jan 2019 trip records (~650MB) | **[⬇ Download from NYC TLC](https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2019-01.parquet)** ¹ |
+| `yellow_tripdata_2019-01.csv` | ~7.67M | Fact table — Jan 2019 trip records (~650MB) | **[⬇ Download from NYC TLC](https://drive.google.com/file/d/1KvgSostr9SUd0DvtCkUkeVQHE1MpXG90/view?usp=drive_link)** ¹ |
 | `taxi_zone_lookup.csv` | 265 | Dimension — zone names, boroughs, service zones | Already in this repo (`data/raw/`) |
 | `taxi_zones.shp` (+ sidecar files) | 263 | Spatial — zone boundary polygons (optional) | Already in this repo (`data/raw/`) |
 
