@@ -4,31 +4,16 @@ data_loader.py
 Task 1 – Data Processing & Cleaning
 Step 1: Load raw source files (CSV trip data, zone lookup CSV, shapefile)
         from the data/raw/ folder.
-
-The trip data file is named yellow_tripdata_2019-01.csv and contains
-January 2019 NYC Yellow Taxi trip records. It's ~650MB, which exceeds
-GitHub's 100MB file limit, so it's hosted externally — see the README
-"Dataset" section for the download link and place it in data/raw/
-before running the pipeline. taxi_zone_lookup.csv and the shapefile are
-small enough to ship directly in this repository.
-
-Usage:
-    from pipeline.data_loader import load_trips, load_zones, load_spatial
-    trips   = load_trips()
-    zones   = load_zones()
-    spatial = load_spatial()   # returns None if geopandas/shapefile unavailable
 """
 
 import pandas as pd
 from pathlib import Path
+from typing import List, Optional
 
-# ── Paths ───────────────────────────────────────────────────────────────────
-# ROOT is the project root (one level above the pipeline/ folder)
+# ── Paths ──────────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
 
-# Primary filename is yellow_tripdata_2019-01.csv (correct TLC naming for
-# the January 2019 data it actually contains). The 2024-01 variants are
-# kept as fallbacks in case an older renamed copy is still in use.
+# Search paths for trip CSV files
 TRIP_CSV_SEARCH = [
     ROOT / "data" / "raw" / "yellow_tripdata_2019-01.csv",
     ROOT / "data" / "yellow_tripdata_2019-01.csv",
@@ -51,74 +36,53 @@ SHAPEFILE_SEARCH = [
     ROOT / "taxi_zones.shp",
 ]
 
-# Columns we actually need from the trip CSV — reading only these keeps
-# memory usage manageable on a 650MB / 7.6M-row file.
+# Columns we actually need from the trip CSV
+# Note: Airport_fee was added in later years (2021+), so it's optional
 TRIP_USECOLS = [
     "VendorID", "tpep_pickup_datetime", "tpep_dropoff_datetime",
     "passenger_count", "trip_distance", "RatecodeID", "store_and_fwd_flag",
     "PULocationID", "DOLocationID", "payment_type",
     "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount",
-    "improvement_surcharge", "total_amount", "congestion_surcharge",
+    "improvement_surcharge", "total_amount", "congestion_surcharge"
 ]
 
+# Data types for faster loading and memory efficiency
 TRIP_DTYPES = {
-    # passenger_count and RatecodeID can contain nulls in the raw 2019 file,
-    # so they're loaded as plain float32 (numpy has no native nullable int)
-    # and cast to proper ints later, after clean.py drops/fills the nulls.
-    # We deliberately avoid pandas *nullable extension* dtypes (Int8,
-    # Float32 capital-F, category) — those use masked-array storage that
-    # doesn't bind correctly to sqlite3 at insert time and can trip CHECK
-    # constraints. Plain numpy dtypes (float32, int32/64, object) are safe;
-    # database/insert.py does a final .astype(object) pass to unwrap numpy
-    # scalars to native Python int/float right before binding.
-    "VendorID":              "float32",
-    "passenger_count":       "float32",
-    "trip_distance":         "float32",
-    "RatecodeID":            "float32",
-    "store_and_fwd_flag":    "object",
-    "PULocationID":          "int32",
-    "DOLocationID":          "int32",
-    "payment_type":          "float32",
-    "fare_amount":           "float32",
-    "extra":                 "float32",
-    "mta_tax":               "float32",
-    "tip_amount":            "float32",
-    "tolls_amount":          "float32",
+    "VendorID": "Int64",
+    "passenger_count": "Int64",
+    "trip_distance": "float32",
+    "RatecodeID": "Int64",
+    "store_and_fwd_flag": "category",
+    "PULocationID": "Int64",
+    "DOLocationID": "Int64",
+    "payment_type": "Int64",
+    "fare_amount": "float32",
+    "extra": "float32",
+    "mta_tax": "float32",
+    "tip_amount": "float32",
+    "tolls_amount": "float32",
     "improvement_surcharge": "float32",
-    "total_amount":          "float32",
-    "congestion_surcharge":  "float32",
+    "total_amount": "float32",
+    "congestion_surcharge": "float32"
 }
 
-
-def _find_file(candidates: list, label: str) -> Path:
-    """Return the first path that exists, or raise a clear error listing all checked paths."""
-    for p in candidates:
-        if p.exists():
-            return p
-    searched = "\n  ".join(str(p) for p in candidates)
-    if "tripdata" in label:
-        hint = (
-            "This is the large trip-data CSV (~650MB), which is too big for "
-            "GitHub and is hosted externally. Download it using the link in "
-            "the README's 'Dataset' section and place it in data/raw/."
-        )
-    else:
-        hint = (
-            "This file should already be in the repo under data/raw/. "
-            "If it's missing, check that your git clone completed fully."
-        )
+def _find_file(search_paths: List[Path], description: str) -> Path:
+    """Find the first existing file in a list of search paths."""
+    for path in search_paths:
+        if path.exists():
+            print(f"[data_loader] Found {description} at: {path}")
+            return path
     raise FileNotFoundError(
-        f"\n[data_loader] Could not find {label}.\n"
-        f"Searched these locations:\n  {searched}\n\n{hint}"
+        f"[data_loader] Could not find {description} in any of these locations:\n"
+        + "\n".join(f"  {p}" for p in search_paths)
     )
-
 
 def load_trips() -> pd.DataFrame:
     """
-    Load the yellow taxi trip CSV (January 2019 data).
+    Load the yellow taxi trip CSV.
     Returns raw DataFrame — no cleaning applied here.
     """
-    path = _find_file(TRIP_CSV_SEARCH, "yellow_tripdata_2019-01.csv (tripdata)")
+    path = _find_file(TRIP_CSV_SEARCH, "yellow_tripdata CSV")
     print(f"[data_loader] Loading trips from:\n  {path}")
     df = pd.read_csv(
         path,
@@ -129,32 +93,30 @@ def load_trips() -> pd.DataFrame:
     print(f"[data_loader] Loaded {len(df):,} raw trip records.")
     return df
 
-
 def load_zones() -> pd.DataFrame:
-    """Load the taxi zone lookup CSV. Returns normalised DataFrame."""
+    """
+    Load the taxi zone lookup CSV (dimension table).
+    Columns: LocationID, Borough, Zone, service_zone
+    """
     path = _find_file(ZONE_CSV_SEARCH, "taxi_zone_lookup.csv")
     print(f"[data_loader] Loading zone lookup from:\n  {path}")
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, keep_default_na=False, na_values=[""])
     df.columns = [c.strip().lower() for c in df.columns]
     df.rename(columns={"locationid": "zone_id", "zone": "zone_name"}, inplace=True)
 
     # TLC's lookup includes two special placeholder zones with blank
-    # fields: 264 "Unknown" (no zone_name/service_zone) and 265 "Outside
-    # of NYC" (no borough/service_zone). Fill them so downstream merges
-    # and the zones DB table (NOT NULL columns) don't silently drop them.
-    df["zone_name"]    = df["zone_name"].fillna("Unknown")
-    df["borough"]      = df["borough"].fillna("Unknown")
+    # fields: 264 "Unknown" and 265 "Outside of NYC".
+    df["zone_name"] = df["zone_name"].fillna("Unknown")
+    df["borough"] = df["borough"].fillna("Unknown")
     df["service_zone"] = df["service_zone"].fillna("N/A")
 
     print(f"[data_loader] Loaded {len(df):,} zone records.")
     return df
 
-
 def load_spatial():
     """
     Load the taxi zones shapefile.
-    Requires geopandas — returns None gracefully if not installed or file missing,
-    so the rest of the pipeline can continue without spatial data.
+    Requires geopandas — returns None gracefully if not installed or file missing.
     """
     try:
         import geopandas as gpd
@@ -175,14 +137,12 @@ def load_spatial():
     print(f"[data_loader] Loaded {len(gdf):,} spatial zone polygons.")
     return gdf
 
-
 def load_all():
     """Load all three source files. Shapefile is optional and may return None."""
     trips   = load_trips()
     zones   = load_zones()
     spatial = load_spatial()
     return trips, zones, spatial
-
 
 if __name__ == "__main__":
     trips, zones, spatial = load_all()
